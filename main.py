@@ -4,26 +4,83 @@ from pygame import mixer
 import pickle
 from os import path
 
-from globalVars import *
-from assetsLoading import *
 from damageInducers import *
 from fish import Fish
 from platforms import Platform
-from button import Button
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
-mixer.init()
 pygame.init()
-
 clock = pygame.time.Clock()
 FPS = 60
+WIDTH = 500
+HEIGHT = 900
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
+
+
+#game variables
+TILE_SIZE = 50
+isGameOver = 0
+mainMenu = True 
+level = 3
+max_levels = 7
+score = 0
+
+#colours
+WHITE = (255, 255, 255)
+BLUE = (0, 0, 255)
+
+#IMAGES
+sun_img = pygame.image.load('assets/sun.png').convert_alpha()
+bg_img = pygame.image.load('assets/sky.jpg').convert_alpha()
+restart_img = pygame.image.load('assets/restart.png').convert_alpha()
+restart_img.convert
+start_img = pygame.image.load('assets/start.png').convert_alpha()
+exit_img = pygame.image.load('assets/exit_btn.png').convert_alpha()
+
+#SOUNDS
+pygame.mixer.music.load('assets/music/cottagecore.mp3')
+pygame.mixer.music.play(-1, 0.0, 5000)
+fish_collected_fx = pygame.mixer.Sound('assets/music/reward.mp3')
+fish_collected_fx.set_volume(0.5)
+jump_fx = pygame.mixer.Sound('assets/music/jump.mp3')
+jump_fx.set_volume(0.5)
+game_over_fx = pygame.mixer.Sound('assets/music/beefmow.mp3')
+
+#FONT
+font = pygame.font.SysFont('Lucida Sans', 70)
+font_score = pygame.font.SysFont('Lucida Sans', 30)
 
 def draw_text(text, font, text_col, x, y):
 	img = font.render(text, True, text_col)
 	screen.blit(img, (x, y))
 
+class Button():
+    def __init__(self, x, y, image):
+        self.image = pygame.transform.scale(image, (200, 50))
 
+        self.rect = pygame.Rect(0, 0, 200, 50)
+        self.rect.x = x
+        self.rect.y = y
+        self.clicked = False
+    def draw(self):
+        action = False
+        #get mouse position
+        pos = pygame.mouse.get_pos()
+        
+        #check mouseover and clicked conditions
+        if self.rect.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                action = True
+                self.clicked = True
+        if pygame.mouse.get_pressed()[0] == 0:
+            self.clicked = False
+        
+        #draw button
+        screen.blit(self.image, self.rect)
+        return action
+
+#========================================== LEVEL RESETER =====================================================
 def reset_level(level):
 	player.reset(100, HEIGHT - 130)
 	blob_group.empty()
@@ -33,16 +90,15 @@ def reset_level(level):
 	exit_group.empty()
 
 	#load in level data and create world
-	if path.exists(f'level{level}_data'):
-		pickle_in = open(f'level{level}_data', 'rb')
+	if path.exists(f'level{level}_data.circ'):
+		pickle_in = open(f'level{level}_data.circ', 'rb')
 		world_data = pickle.load(pickle_in)
 	world = World(world_data)
  
 	#dummy fish next to the  score
-	score_fish = Fish(TILE_SIZE // 2, TILE_SIZE // 2)
+	score_fish = Fish( TILE_SIZE // 2, TILE_SIZE // 2 )
 	fish_group.add(score_fish)
 	return world
-
 
 #======================================== PLAYER =====================================================
 class Player():
@@ -50,13 +106,12 @@ class Player():
 		self.reset(x, y)
 
 	def update(self, isGameOver):
-		x_speed = 0
-		y_speed = 0
-		walk_cooldown = 5
+		x_speed, y_speed  = 0, 0
+		walk_cooldown = 5  # n iterations need to pass before the animation index increases // acts as a limit
 		col_thresh = 20
-
+		# the counter var is to help not increase anim index all the time  // it increases till walk cooldown and then we increase anim indx
 		if isGameOver == 0:
-			#### KEY MOVEMENT INPUTS ####
+			####------KEY MOVEMENT INPUTS------####
 			key = pygame.key.get_pressed()
 			if key[pygame.K_SPACE] and self.jumped == False and self.in_air == False:
 				jump_fx.play()
@@ -81,7 +136,7 @@ class Player():
 					self.image = self.images_left[self.index]
 
 
-			#### ANIMATION HANDLING ####
+			####------ANIMATION HANDLING------####
 			if self.counter > walk_cooldown:
 				self.counter = 0	
 				self.index += 1
@@ -99,7 +154,7 @@ class Player():
 				self.vel_y = 10
 			y_speed += self.vel_y
 
-			#COLLISION
+			#------COLLISION------
 			self.in_air = True
 			for tile in world.tile_list:
 				#check for collision in x direction
@@ -109,6 +164,7 @@ class Player():
 				if tile[1].colliderect(self.rect.x, self.rect.y + y_speed, self.width, self.height):
 					#check if below the ground i.e. jumping
 					if self.vel_y < 0:
+						#y_speed -> the top of the players head and the bottom of the block its about to hit
 						y_speed = tile[1].bottom - self.rect.top
 						self.vel_y = 0
 					#check if above the ground i.e. falling
@@ -177,12 +233,12 @@ class Player():
 		self.index = 0
 		self.counter = 0
 		for num in range(1, 5):
-			img_right = pygame.image.load(f'assets/guy{num}.png')
+			img_right = pygame.image.load(f'assets/cat{num}.png').convert_alpha()
 			img_right = pygame.transform.scale(img_right, (40, 80))
 			img_left = pygame.transform.flip(img_right, True, False)
 			self.images_right.append(img_right)
 			self.images_left.append(img_left)
-		self.dead_image = pygame.image.load('assets/ghost.png')
+		self.dead_image = pygame.image.load('assets/ghost.png').convert_alpha()
 		self.image = self.images_right[self.index]
 		self.rect = self.image.get_rect()
 		self.rect.x = x
@@ -200,8 +256,8 @@ class Player():
 #========================================== WORLD =====================================================
 class World():
 	def __init__(self, data):
-		dirt_img = pygame.image.load('assets/dirt.png')
-		grass_img = pygame.image.load('assets/grass.png')
+		dirt_img = pygame.image.load('assets/dirt.png').convert_alpha()
+		grass_img = pygame.image.load('assets/grass.png').convert_alpha()
 
 		self.tile_list = []
 		row_count = 0
@@ -261,7 +317,7 @@ class World():
 class Exit(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
-		img = pygame.image.load('assets/exit.png')
+		img = pygame.image.load('assets/exit.png').convert_alpha()
 		self.image = pygame.transform.scale(img, (TILE_SIZE, int( TILE_SIZE * 1.5 )))
 		self.rect = self.image.get_rect()
 		self.rect.x = x
@@ -278,96 +334,94 @@ lava_group = pygame.sprite.Group()
 fish_group = pygame.sprite.Group()
 exit_group = pygame.sprite.Group()
     
-#load in level data and create world
-if path.exists(f'level{level}_data'):
-	pickle_in = open(f'level{level}_data', 'rb')
-	world_data = pickle.load(pickle_in)
+#------	LOAD LEVEL DATA AND CREATE WORLD------#
+#if path.exists(f'level{level}_data'):
+pickle_in = open(f'level{level}_data.circ', 'rb')
+world_data = pickle.load(pickle_in)
+
 world = World(world_data)
 
+restart_button = Button (WIDTH // 2 - 50, HEIGHT // 2 + 100, restart_img)
+start_button = Button(WIDTH // 2 - 350, HEIGHT // 2, start_img)
+exit_button = Button(WIDTH // 2 + 150, HEIGHT // 2, exit_img)
 
 
 
 #========================================== GAME LOOP =====================================================
-def main():
-    #create dummy fish for showing the score
-    score_fish = Fish(TILE_SIZE // 2, TILE_SIZE // 2)
-    fish_group.add(score_fish) 
-    
-    restart_button = Button(WIDTH // 2 - 50, HEIGHT // 2 + 100, restart_img)
-    start_button = Button(WIDTH // 2 - 350, HEIGHT // 2, start_img)
-    exit_button = Button(WIDTH // 2 + 150, HEIGHT // 2, exit_img)
-    
-    
-    run = True
-    while run:
 
-        clock.tick(FPS)
+#create dummy fish for showing the score
+score_fish = Fish(TILE_SIZE // 2, TILE_SIZE // 2)
+fish_group.add(score_fish) 
+mainMenu = True
+run = True
+while run:
+	
+	clock.tick(FPS)
 
-        screen.blit(bg_img, (0, 0))
-        screen.blit(sun_img, (100, 100))
+	screen.blit(bg_img, (0, 0))
+	screen.blit(sun_img, (100, 100))
 
-        if mainMenu == True:
-            if exit_button.draw():
-                run = False
-            if start_button.draw():
-                mainMenu = False
-        else:
-            world.draw()
+	if mainMenu == True:
+		if exit_button.draw():
+			run = False
+		if start_button.draw():
+			mainMenu = False
+	else:
+		world.draw()
 
-            if isGameOver == 0:
-                blob_group.update()
-                platform_group.update()
-                #update score
-                #check if a fish has been collected
-                if pygame.sprite.spritecollide(player, fish_group, True):
-                    score += 1
-                    fish_collected_fx.play()
-                draw_text('X ' + str(score), font_score, WHITE, TILE_SIZE - 10, 10)
-            
-            blob_group.draw(screen)
-            platform_group.draw(screen)
-            lava_group.draw(screen)
-            fish_group.draw(screen)
-            exit_group.draw(screen)
+		if isGameOver == 0:
+			blob_group.update()
+			platform_group.update()
+			#update score
+			#check if a fish has been collected
+			if pygame.sprite.spritecollide(player, fish_group, True):
+				score += 1
+				fish_collected_fx.play()
+			draw_text('X ' + str(score), font_score, WHITE, TILE_SIZE - 10, 10)
+		
+		blob_group.draw(screen)
+		platform_group.draw(screen)
+		lava_group.draw(screen)
+		fish_group.draw(screen)
+		exit_group.draw(screen)
 
-            isGameOver = player.update(isGameOver)
+		isGameOver = player.update(isGameOver)
 
-            #if player has died
-            if isGameOver == -1:
-                if restart_button.draw():
-                    world_data = []
-                    world = reset_level(level)
-                    isGameOver = 0
-                    score = 0
+		#if player has died
+		if isGameOver == -1:
+			if restart_button.draw():
+				world_data = []
+				world = reset_level(level)
+				isGameOver = 0
+				score = 0
 
-            #if player has completed the level
-            if isGameOver == 1:
-                #reset game and go to next level
-                level += 1
-                if level <= max_levels:
-                    #reset level
-                    world_data = []
-                    world = reset_level(level)
-                    isGameOver = 0
-                else:
-                    draw_text('GAME WON', font, BLUE, (WIDTH // 2) - 140, HEIGHT // 2)
-                    if restart_button.draw():
-                        level = 1
-                        #reset level
-                        world_data = []
-                        world = reset_level(level)
-                        isGameOver = 0
-                        score = 0
+		#if player has completed the level
+		if isGameOver == 1:
+			#reset game and go to next level
+			level += 1
+			if level <= max_levels:
+				#reset level
+				world_data = []
+				world = reset_level(level)
+				isGameOver = 0
+			else:
+				draw_text('GAME WON', font, BLUE, (WIDTH // 2) - 140, HEIGHT // 2)
+				if restart_button.draw():
+					level = 1
+					#reset level
+					world_data = []
+					world = reset_level(level)
+					isGameOver = 0
+					score = 0
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			run = False
 
-        pygame.display.update()
+	pygame.display.update()
 
-    pygame.quit()
+pygame.quit()
+
+
     
     
-    
-    
-main()

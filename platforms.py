@@ -4,7 +4,7 @@ from globalVars import TILE_SIZE
 class Platform(pygame.sprite.Sprite):
 	def __init__(self, x, y, move_x, move_y):
 		pygame.sprite.Sprite.__init__(self)
-		img = pygame.image.load('img/platform.png')
+		img = pygame.image.load('assets/platform.png').convert_alpha()
 		self.image = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE // 2))
 		self.rect = self.image.get_rect()
 		self.rect.x = x
