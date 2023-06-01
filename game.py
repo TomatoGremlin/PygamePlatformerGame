@@ -8,24 +8,20 @@ from globalVars import*
 from loadFiles import*
 from obstacles import*
 from utils import*
+from worldMap import*
 
-pygame.display.set_caption('Platformer')
-
-
+pygame.display.set_caption("Topcho's Bizzare Adventure")
 
 
 class Player():
 	def __init__(self, x, y):
 		self.reset(x, y)
-		global fade_counter 
 
 
 	def update(self, game_over, fade_counter):
-		dx = 0
-		dy = 0
+		dx, dy = 0, 0
 		walk_cooldown = 5
 		col_thresh = 20
-
 
 		if game_over == 0:
 			#get keypresses
@@ -47,23 +43,34 @@ class Player():
 			if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
 				self.counter = 0
 				self.index = 0
+    
 				if self.direction == 1:
 					self.image = self.images_right[self.index]
 				if self.direction == -1:
 					self.image = self.images_left[self.index]
+
 
 
 			#handle animation
-			if self.counter > walk_cooldown:
-				self.counter = 0	
-				self.index += 1
-				if self.index >= len(self.images_right):
-					self.index = 0
+			if self.in_air:
+			
 				if self.direction == 1:
-					self.image = self.images_right[self.index]
-				if self.direction == -1:
-					self.image = self.images_left[self.index]
+					self.image = self.images_jumping_right[self.counter // walk_cooldown % len(self.images_jumping_right)]
+				elif self.direction == -1:
+					self.image = self.images_jumping_left[self.counter // walk_cooldown % len(self.images_jumping_right)]
+				self.counter = 0  # Reset the counter to prevent frame switching during jump
 
+			else:
+				if self.counter > walk_cooldown:
+					self.counter = 0	
+					self.index += 1
+					if self.index >= len(self.images_right):
+						self.index = 0
+					if self.direction == 1:
+						self.image = self.images_right[self.index]
+					if self.direction == -1:
+						self.image = self.images_left[self.index]
+  
 
 			#add gravity
 			self.vel_y += 1
@@ -140,7 +147,7 @@ class Player():
 					pygame.draw.rect(screen, WHITE, (SCREEN_WIDTH - fade_counter, y*100, SCREEN_WIDTH, SCREEN_HEIGHT ))
    
 			draw_text('GAME OVER!', FONT_BIG, BLUE_DARK, (SCREEN_WIDTH // 2) - 200, SCREEN_HEIGHT // 2)
-			if self.rect.y > 200:
+			if self.rect.y > -SCREEN_HEIGHT:
 				self.rect.y -= 5
 
 		#draw player onto screen
@@ -153,18 +160,28 @@ class Player():
 
 
 		self.images_right, self.images_left  = [], []
-		self.index = 0
-		self.counter = 0
+		self.images_jumping_right, self.images_jumping_left  = [], []
+		self.index, self.counter = 0, 0
+  
 		for num in range(1, 5):
 			img_right = pygame.image.load(f'assets/cat{num}.png')
 			img_right = pygame.transform.scale(img_right, (40, 40))
 			img_left = pygame.transform.flip(img_right, True, False)
+   
+			img_jumping_right = pygame.image.load(f'assets/cat_jump1.png')
+			img_jumping_right = pygame.transform.scale(img_jumping_right, (40, 40))
+			img_jumping_left = pygame.transform.flip(img_jumping_right, True, False)
+
 			self.images_right.append(img_right)
 			self.images_left.append(img_left)
+			self.images_jumping_right.append(img_jumping_right)
+			self.images_jumping_left.append(img_jumping_left)
+
    
 		self.dead_image = pygame.transform.scale( pygame.image.load('assets/ghost.png'), (40,40) )
               
 		self.image = self.images_right[self.index]
+
 		self.rect = self.image.get_rect()
 		self.rect.x, self.rect.y = x, y
 		self.width, self.height  = self.image.get_width(), self.image.get_height()
@@ -175,70 +192,8 @@ class Player():
 
 
 
-class World():
-	def __init__(self, data):
-		self.tile_list = []
-
-		#load images
-		dirt_img = pygame.image.load('assets/dirt.png')
-		grass_img = pygame.image.load('assets/grass.png')
-
-		row_count = 0
-		for row in data:
-			col_count = 0
-			for tile in row:
-				if tile == 1:
-					img = pygame.transform.scale(dirt_img, (TILE_SIZE, TILE_SIZE))
-					img_rect = img.get_rect()
-					img_rect.x, img_rect.y  = col_count * TILE_SIZE, row_count * TILE_SIZE
-					collision_rect = img_rect
-
-					tile = (img, img_rect, collision_rect)
-					self.tile_list.append(tile)
-				if tile == 2:
-					img = pygame.transform.scale(grass_img, (TILE_SIZE, TILE_SIZE))
-					img_rect = img.get_rect()
-					img_rect.x, img_rect.y  = col_count * TILE_SIZE, row_count * TILE_SIZE
-     
-					OFFSET_Y = 10  
-					collision_rect = pygame.Rect(img_rect.left, img_rect.top + OFFSET_Y, img_rect.width, img_rect.height - OFFSET_Y)
-					tile = (img, img_rect, collision_rect)
-					self.tile_list.append(tile)
-					
-				if tile == 3:
-					blob = Enemy(col_count * TILE_SIZE, row_count * TILE_SIZE + 15)
-					blob_group.add(blob)
-				if tile == 4:
-					platform = Platform(col_count * TILE_SIZE, row_count * TILE_SIZE, 1, 0)
-					platform_group.add(platform)
-				if tile == 5:
-					platform = Platform(col_count * TILE_SIZE, row_count * TILE_SIZE, 0, 1)
-					platform_group.add(platform)
-				if tile == 6:
-					lava = Lava(col_count * TILE_SIZE, row_count * TILE_SIZE + (TILE_SIZE // 2))
-					lava_group.add(lava)
-				if tile == 7:
-					coin = Coin(col_count * TILE_SIZE + (TILE_SIZE // 2), row_count * TILE_SIZE + (TILE_SIZE // 2))
-					coin_group.add(coin)
-				if tile == 8:
-					exit = Exit(col_count * TILE_SIZE, row_count * TILE_SIZE - (TILE_SIZE // 2))
-					exit_group.add(exit)
-				col_count += 1
-			row_count += 1
-
-
-	def draw(self):
-		for tile in self.tile_list:
-			screen.blit(tile[0], tile[1])
-
-
 
 player = Player(100, SCREEN_HEIGHT - 120)
-blob_group = pygame.sprite.Group()
-platform_group = pygame.sprite.Group()
-lava_group = pygame.sprite.Group()
-coin_group = pygame.sprite.Group()
-exit_group = pygame.sprite.Group()
 
 #dummy coin for showing the score
 score_coin = Coin(TILE_SIZE // 2, TILE_SIZE // 2)
@@ -281,12 +236,14 @@ while run:
 	screen.blit(bg_img, (0, 0))
 	screen.blit(sun_img, (100, 100))
 
+	#----- MAIN MENU SCREEN ----#
 	if main_menu == True:
 		if exit_button.draw():
 			run = False
 		if start_button.draw():
 			main_menu = False
 	else:
+    #----GAME----#
 		world.draw()
 
 		if game_over == 0:
@@ -326,6 +283,12 @@ while run:
 				world = reset_level(level)
 				game_over = 0
 			else:
+				rect_width = SCREEN_WIDTH
+				rect_height = 80
+				rectangle_x = (SCREEN_WIDTH // 2) - (rect_width // 2)
+				rectangle_y = (SCREEN_HEIGHT // 2) - (rect_height // 2) + 50
+				pygame.draw.rect(screen, BLUE_LIGHT, (rectangle_x, rectangle_y, rect_width, rect_height))
+
 				draw_text('YOU WIN!', FONT_BIG, BLUE_DARK, (SCREEN_WIDTH // 2) - 160, SCREEN_HEIGHT // 2)
 				if restart_button.draw():
 					level = 1

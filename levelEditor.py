@@ -26,6 +26,8 @@ bg_img = pygame.image.load('assets/sky.png')
 bg_img = pygame.transform.scale(bg_img, (screen_width, screen_height - margin))
 dirt_img = pygame.image.load('assets/dirt.png')
 grass_img = pygame.image.load('assets/grass.png')
+cave_img = pygame.image.load('assets/cave.png')
+
 blob_img = pygame.image.load('assets/blob.png')
 platform_x_img = pygame.image.load('assets/platform_x.png')
 platform_y_img = pygame.image.load('assets/platform_y.png')
@@ -84,6 +86,7 @@ def draw_world():
 					#grass blocks
 					img = pygame.transform.scale(grass_img, (tile_size, tile_size))
 					screen.blit(img, (col * tile_size, row * tile_size))
+     
 				if world_data[row][col] == 3:
 					#enemy blocks
 					img = pygame.transform.scale(blob_img, (tile_size, int(tile_size * 0.75)))
@@ -109,6 +112,11 @@ def draw_world():
 					img = pygame.transform.scale(exit_img, (tile_size, int(tile_size * 1.5)))
 					screen.blit(img, (col * tile_size, row * tile_size - (tile_size // 2)))
 
+				if world_data[row][col] == 9:
+					#cave blocks
+					img = pygame.transform.scale(cave_img, (tile_size, tile_size))
+					screen.blit(img, (col * tile_size, row * tile_size))
+				
 
 
 class Button():
@@ -156,13 +164,13 @@ while run:
 	#load and save level
 	if save_button.draw():
 		#save level data
-		pickle_out = open(f'level{level}_data', 'wb')
+		pickle_out = open(f'levels/level{level}_data', 'wb')
 		pickle.dump(world_data, pickle_out)
 		pickle_out.close()
 	if load_button.draw():
 		#load in level data
-		if path.exists(f'level{level}_data'):
-			pickle_in = open(f'level{level}_data', 'rb')
+		if path.exists(f'levels/level{level}_data'):
+			pickle_in = open(f'levels/level{level}_data', 'rb')
 			world_data = pickle.load(pickle_in)
 
 
@@ -191,12 +199,12 @@ while run:
 				#update tile value
 				if pygame.mouse.get_pressed()[0] == 1:
 					world_data[y][x] += 1
-					if world_data[y][x] > 8:
+					if world_data[y][x] > 9:
 						world_data[y][x] = 0
 				elif pygame.mouse.get_pressed()[2] == 1:
 					world_data[y][x] -= 1
 					if world_data[y][x] < 0:
-						world_data[y][x] = 8
+						world_data[y][x] = 9
 		if event.type == pygame.MOUSEBUTTONUP:
 			clicked = False
 		#up and down key presses to change level number

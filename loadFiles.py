@@ -4,7 +4,7 @@ from globalVars import TILE_SIZE, SCREEN_WIDTH , SCREEN_HEIGHT
 pygame.mixer.pre_init(44100, -16, 2, 512)
 mixer.init()
 
-#load images
+#IMAGES
 sun_img = pygame.image.load('assets/sun.png')
 sun_img = pygame.transform.scale(sun_img, (TILE_SIZE, TILE_SIZE))
 bg_img = pygame.image.load('assets/sky.png')
