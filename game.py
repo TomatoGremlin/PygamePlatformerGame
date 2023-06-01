@@ -3,41 +3,14 @@ from pygame.locals import *
 from pygame import mixer
 import pickle
 from os import path
+from button import*
+from gameObjects import*
+from globalVars import*
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
 mixer.init()
-pygame.init()
 
-clock = pygame.time.Clock()
-FPS = 60
-
-SCREEN_WIDTH = 650
-SCREEN_HEIGHT = 650
-
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Platformer')
-
-
-#define FONT_BIG
-FONT_BIG = pygame.font.SysFont('Lucida Sans', 70)
-FONT_SMALL = pygame.font.SysFont('Lucida Sans', 30)
-
-
-#define game variables
-TILE_SIZE = 50
-game_over = 0
-main_menu = True
-
-level = 2
-MAX_LEVELS = 7
-score = 0
-
-
-#define colours
-WHITE = (255, 255, 255)
-BLUE_DARK = (26, 32, 44)
-BLUE_LIGHT = (142, 166, 254)
-
 
 #load images
 sun_img = pygame.image.load('assets/sun.png')
@@ -57,8 +30,12 @@ pygame.mixer.music.play(-1, 0.0, 5000)
 coin_fx = pygame.mixer.Sound('assets/music/reward.mp3')
 coin_fx.set_volume(0.5)
 jump_fx = pygame.mixer.Sound('assets/music/jump.mp3')
-jump_fx.set_volume(0.5)
+jump_fx.set_volume(0.3)
 game_over_fx = pygame.mixer.Sound('assets/music/beefmow.mp3')
+victory_fx =  pygame.mixer.Sound('assets/music/winsquare-6993.mp3')
+victory_fx.set_volume(0.3)
+
+
 
 
 def draw_text(text, FONT_BIG, text_col, x, y):
@@ -86,34 +63,6 @@ def reset_level(level):
 	return world
 
 
-class Button():
-	def __init__(self, x, y, image):
-		self.image = image
-		self.rect = self.image.get_rect()
-		self.rect.x = x
-		self.rect.y = y
-		self.clicked = False
-
-	def draw(self):
-		action = False
-
-		#get mouse position
-		pos = pygame.mouse.get_pos()
-
-		#check mouseover and clicked conditions
-		if self.rect.collidepoint(pos):
-			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-				action = True
-				self.clicked = True
-
-		if pygame.mouse.get_pressed()[0] == 0:
-			self.clicked = False
-
-
-		#draw button
-		screen.blit(self.image, self.rect)
-
-		return action
 
 
 class Player():
@@ -389,23 +338,7 @@ class Lava(pygame.sprite.Sprite):
 		self.rect.y = y
 
 
-class Coin(pygame.sprite.Sprite):
-	def __init__(self, x, y):
-		pygame.sprite.Sprite.__init__(self)
-		img = pygame.image.load('assets/coin.png')
-		self.image = pygame.transform.scale(img, (TILE_SIZE // 1.5, TILE_SIZE // 1.5))
-		self.rect = self.image.get_rect()
-		self.rect.center = (x, y)
 
-
-class Exit(pygame.sprite.Sprite):
-	def __init__(self, x, y):
-		pygame.sprite.Sprite.__init__(self)
-		img = pygame.image.load('assets/exit.png')
-		self.image = pygame.transform.scale(img, (TILE_SIZE, int(TILE_SIZE * 1.5)))
-		self.rect = self.image.get_rect()
-		self.rect.x = x
-		self.rect.y = y
 
 
 
@@ -486,9 +419,8 @@ while run:
 				world = reset_level(level)
 				game_over = 0
 			else:
-				draw_text('YOU WIN!', FONT_BIG, BLUE_DARK, (SCREEN_WIDTH // 2) - 140, SCREEN_HEIGHT // 2)
+				draw_text('YOU WIN!', FONT_BIG, BLUE_DARK, (SCREEN_WIDTH // 2) - 160, SCREEN_HEIGHT // 2)
 				if restart_button.draw():
-					fade_counter
 					level = 1
 					#reset level
 					world_data = []

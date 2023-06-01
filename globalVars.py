@@ -1,20 +1,29 @@
 import pygame
-import os
+pygame.init()
 
-WIDTH = 900
-HEIGHT = 100
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+clock = pygame.time.Clock()
+FPS = 60
+
+SCREEN_WIDTH = 650
+SCREEN_HEIGHT = 650
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+#define FONT_BIG
+FONT_BIG = pygame.font.SysFont('Lucida Sans', 70)
+FONT_SMALL = pygame.font.SysFont('Lucida Sans', 30)
 
 
-
-#game variables
+#define game variables
 TILE_SIZE = 50
-isGameOver = 0
-mainMenu = True 
-level = 3
-max_levels = 7
+game_over = 0
+main_menu = True
+
+level = 2
+MAX_LEVELS = 2
 score = 0
 
-#colours
+
+#define colours
 WHITE = (255, 255, 255)
-BLUE = (0, 0, 255)
+BLUE_DARK = (26, 32, 44)
+BLUE_LIGHT = (142, 166, 254)
