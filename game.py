@@ -99,17 +99,17 @@ class Player():
 			self.in_air = True
 			for tile in world.tile_list:
 				#check for collision in x direction
-				if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+				if tile[2].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
 					dx = 0
 				#check for collision in y direction
-				if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+				if tile[2].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
 					#check if below the ground i.e. jumping
 					if self.vel_y < 0:
-						dy = tile[1].bottom - self.rect.top 
+						dy = tile[2].bottom - self.rect.top 
 						self.vel_y = 0
 					#check if above the ground i.e. falling
 					elif self.vel_y >= 0:
-						dy = tile[1].top - self.rect.bottom
+						dy = tile[2].top - self.rect.bottom
 						self.vel_y = 0
 						self.in_air = False
 
@@ -215,16 +215,19 @@ class World():
 				if tile == 1:
 					img = pygame.transform.scale(dirt_img, (TILE_SIZE, TILE_SIZE))
 					img_rect = img.get_rect()
-					img_rect.x = col_count * TILE_SIZE
-					img_rect.y = row_count * TILE_SIZE
-					tile = (img, img_rect)
+					img_rect.x, img_rect.y  = col_count * TILE_SIZE, row_count * TILE_SIZE
+					collision_rect = img_rect
+
+					tile = (img, img_rect, collision_rect)
 					self.tile_list.append(tile)
 				if tile == 2:
 					img = pygame.transform.scale(grass_img, (TILE_SIZE, TILE_SIZE))
 					img_rect = img.get_rect()
-					img_rect.x = col_count * TILE_SIZE
-					img_rect.y = row_count * TILE_SIZE 
-					tile = (img, img_rect)
+					img_rect.x, img_rect.y  = col_count * TILE_SIZE, row_count * TILE_SIZE
+     
+					OFFSET_Y = 10  
+					collision_rect = pygame.Rect(img_rect.left, img_rect.top + OFFSET_Y, img_rect.width, img_rect.height - OFFSET_Y)
+					tile = (img, img_rect, collision_rect)
 					self.tile_list.append(tile)
 					
 				if tile == 3:
@@ -251,8 +254,6 @@ class World():
 
 	def draw(self):
 		for tile in self.tile_list:
-			pygame.draw.rect(screen, (255, 0, 0), tile[1], 1)
-
 			screen.blit(tile[0], tile[1])
 
 
