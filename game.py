@@ -19,8 +19,8 @@ pygame.display.set_caption('Platformer')
 
 
 #define FONT_BIG
-FONT_BIG = pygame.font.SysFont('Bauhaus 93', 70)
-FONT_SMALL = pygame.font.SysFont('Bauhaus 93', 30)
+FONT_BIG = pygame.font.SysFont('Lucida Sans', 70)
+FONT_SMALL = pygame.font.SysFont('Lucida Sans', 30)
 
 
 #define game variables
@@ -119,12 +119,15 @@ class Button():
 class Player():
 	def __init__(self, x, y):
 		self.reset(x, y)
+		global fade_counter 
 
-	def update(self, game_over):
+
+	def update(self, game_over, fade_counter):
 		dx = 0
 		dy = 0
 		walk_cooldown = 5
 		col_thresh = 20
+
 
 		if game_over == 0:
 			#get keypresses
@@ -180,7 +183,7 @@ class Player():
 				if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
 					#check if below the ground i.e. jumping
 					if self.vel_y < 0:
-						dy = tile[1].bottom - self.rect.top
+						dy = tile[1].bottom - self.rect.top 
 						self.vel_y = 0
 					#check if above the ground i.e. falling
 					elif self.vel_y >= 0:
@@ -232,6 +235,12 @@ class Player():
 
 		elif game_over == -1:
 			self.image = self.dead_image
+			if fade_counter < SCREEN_WIDTH:
+				fade_counter += 5 
+				for y in range(0, 6, 2):
+					pygame.draw.rect(screen, WHITE, (0, y * 100, fade_counter, SCREEN_HEIGHT  ))
+					pygame.draw.rect(screen, WHITE, (SCREEN_WIDTH - fade_counter, y*100, SCREEN_WIDTH, SCREEN_HEIGHT ))
+   
 			draw_text('GAME OVER!', FONT_BIG, BLUE_DARK, (SCREEN_WIDTH // 2) - 200, SCREEN_HEIGHT // 2)
 			if self.rect.y > 200:
 				self.rect.y -= 5
@@ -239,13 +248,14 @@ class Player():
 		#draw player onto screen
 		screen.blit(self.image, self.rect)
 
-		return game_over
+		return game_over, fade_counter
 
 
 	def reset(self, x, y):
-        
-		self.images_right = []
-		self.images_left = []
+
+		global fade_counter 
+
+		self.images_right, self.images_left  = [], []
 		self.index = 0
 		self.counter = 0
 		for num in range(1, 5):
@@ -259,10 +269,8 @@ class Player():
               
 		self.image = self.images_right[self.index]
 		self.rect = self.image.get_rect()
-		self.rect.x = x
-		self.rect.y = y
-		self.width = self.image.get_width()
-		self.height = self.image.get_height()
+		self.rect.x, self.rect.y = x, y
+		self.width, self.height  = self.image.get_width(), self.image.get_height()
 		self.vel_y = 0
 		self.jumped = False
 		self.direction = 0
@@ -293,9 +301,10 @@ class World():
 					img = pygame.transform.scale(grass_img, (TILE_SIZE, TILE_SIZE))
 					img_rect = img.get_rect()
 					img_rect.x = col_count * TILE_SIZE
-					img_rect.y = row_count * TILE_SIZE
+					img_rect.y = row_count * TILE_SIZE 
 					tile = (img, img_rect)
 					self.tile_list.append(tile)
+					
 				if tile == 3:
 					blob = Enemy(col_count * TILE_SIZE, row_count * TILE_SIZE + 15)
 					blob_group.add(blob)
@@ -320,6 +329,8 @@ class World():
 
 	def draw(self):
 		for tile in self.tile_list:
+			pygame.draw.rect(screen, (255, 0, 0), tile[1], 1)
+
 			screen.blit(tile[0], tile[1])
 
 
@@ -398,7 +409,7 @@ class Exit(pygame.sprite.Sprite):
 
 
 
-player = Player(100, SCREEN_HEIGHT - 130)
+player = Player(100, SCREEN_HEIGHT - 120)
 
 blob_group = pygame.sprite.Group()
 platform_group = pygame.sprite.Group()
@@ -421,12 +432,12 @@ restart_button = Button(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT // 2 + 100, restar
 start_button = Button(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, start_img)
 exit_button = Button(SCREEN_WIDTH // 2 + 30, SCREEN_HEIGHT // 2, exit_img)
 
+fade_counter = 0
 
 run = True
 while run:
 
 	clock.tick(FPS)
-
 	screen.blit(bg_img, (0, 0))
 	screen.blit(sun_img, (100, 100))
 
@@ -454,11 +465,12 @@ while run:
 		coin_group.draw(screen)
 		exit_group.draw(screen)
 
-		game_over = player.update(game_over)
+		game_over, fade_counter = player.update(game_over, fade_counter)
 
 		#if player has died
 		if game_over == -1:
 			if restart_button.draw():
+				fade_counter = 0
 				world_data = []
 				world = reset_level(level)
 				game_over = 0
@@ -476,6 +488,7 @@ while run:
 			else:
 				draw_text('YOU WIN!', FONT_BIG, BLUE_DARK, (SCREEN_WIDTH // 2) - 140, SCREEN_HEIGHT // 2)
 				if restart_button.draw():
+					fade_counter
 					level = 1
 					#reset level
 					world_data = []
