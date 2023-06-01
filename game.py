@@ -10,7 +10,6 @@ from loadFiles import*
 from obstacles import*
 
 
-
 pygame.display.set_caption('Platformer')
 
 def draw_text(text, FONT_BIG, text_col, x, y):
@@ -28,8 +27,8 @@ def reset_level(level):
 	exit_group.empty()
 
 	#load in level data and create world
-	if path.exists(f'level{level}_data'):
-		pickle_in = open(f'level{level}_data', 'rb')
+	if path.exists(f'levels/level{level}_data'):
+		pickle_in = open(f'levels/level{level}_data', 'rb')
 		world_data = pickle.load(pickle_in)
 	world = World(world_data)
 	#create dummy coin for showing the score
@@ -258,12 +257,6 @@ class World():
 
 
 
-
-
-
-
-
-
 player = Player(100, SCREEN_HEIGHT - 120)
 
 blob_group = pygame.sprite.Group()
@@ -272,12 +265,12 @@ lava_group = pygame.sprite.Group()
 coin_group = pygame.sprite.Group()
 exit_group = pygame.sprite.Group()
 
-#create dummy coin for showing the score
+#dummy coin for showing the score
 score_coin = Coin(TILE_SIZE // 2, TILE_SIZE // 2)
 coin_group.add(score_coin)
 
 #load in level data and create world
-pickle_in = open(f'level{level}_data', 'rb')
+pickle_in = open(f'levels/level{level}_data', 'rb')
 world_data = pickle.load(pickle_in)
 world = World(world_data)
 
