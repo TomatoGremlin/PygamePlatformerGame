@@ -1,6 +1,6 @@
 import pygame
 from globalVars import screen
-
+from loadFiles import click_fx
 
 
 class Button():
@@ -20,6 +20,7 @@ class Button():
 		#check mouseover and clicked conditions
 		if self.rect.collidepoint(pos):
 			if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+				click_fx.play()
 				action = True
 				self.clicked = True
 

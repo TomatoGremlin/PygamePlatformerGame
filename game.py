@@ -1,6 +1,5 @@
 import pygame
 from pygame.locals import *
-import pickle
 from os import path
 
 from button import*
@@ -8,33 +7,10 @@ from gameObjects import*
 from globalVars import*
 from loadFiles import*
 from obstacles import*
-
+from utils import*
 
 pygame.display.set_caption('Platformer')
 
-def draw_text(text, FONT_BIG, text_col, x, y):
-	img = FONT_BIG.render(text, True, text_col)
-	screen.blit(img, (x, y))
-
-
-#function to reset level
-def reset_level(level):
-	player.reset(100, SCREEN_HEIGHT - 130)
-	blob_group.empty()
-	platform_group.empty()
-	coin_group.empty()
-	lava_group.empty()
-	exit_group.empty()
-
-	#load in level data and create world
-	if path.exists(f'levels/level{level}_data'):
-		pickle_in = open(f'levels/level{level}_data', 'rb')
-		world_data = pickle.load(pickle_in)
-	world = World(world_data)
-	#create dummy coin for showing the score
-	score_coin = Coin(TILE_SIZE // 2, TILE_SIZE // 2)
-	coin_group.add(score_coin)
-	return world
 
 
 
@@ -175,7 +151,6 @@ class Player():
 
 	def reset(self, x, y):
 
-		global fade_counter 
 
 		self.images_right, self.images_left  = [], []
 		self.index = 0
@@ -259,7 +234,6 @@ class World():
 
 
 player = Player(100, SCREEN_HEIGHT - 120)
-
 blob_group = pygame.sprite.Group()
 platform_group = pygame.sprite.Group()
 lava_group = pygame.sprite.Group()
@@ -271,15 +245,32 @@ score_coin = Coin(TILE_SIZE // 2, TILE_SIZE // 2)
 coin_group.add(score_coin)
 
 #load in level data and create world
-pickle_in = open(f'levels/level{level}_data', 'rb')
-world_data = pickle.load(pickle_in)
-world = World(world_data)
-
+world = World(load_data(level))
 
 #create buttons
 restart_button = Button(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT // 2 + 100, restart_img)
 start_button = Button(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, start_img)
 exit_button = Button(SCREEN_WIDTH // 2 + 30, SCREEN_HEIGHT // 2, exit_img)
+
+#function to reset level
+def reset_level(level):
+	player.reset(100, SCREEN_HEIGHT - 130)
+	blob_group.empty()
+	platform_group.empty()
+	coin_group.empty()
+	lava_group.empty()
+	exit_group.empty()
+
+	#load in level data and create world
+	if path.exists(f'levels/level{level}_data'):
+		pickle_in = open(f'levels/level{level}_data', 'rb')
+		world_data = pickle.load(pickle_in)
+	world = World(world_data)
+ 
+	#create dummy coin for showing the score
+	score_coin = Coin(TILE_SIZE // 2, TILE_SIZE // 2)
+	coin_group.add(score_coin)
+	return world
 
 
 fade_counter = 0
