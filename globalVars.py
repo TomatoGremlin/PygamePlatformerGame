@@ -27,3 +27,5 @@ score = 0
 WHITE = (255, 255, 255)
 BLUE_DARK = (26, 32, 44)
 BLUE_LIGHT = (142, 166, 254)
+
+

@@ -1,15 +1,14 @@
 import pygame
-from globalVars import TILE_SIZE, screen
+from globalVars import*
 from gameObjects  import*
 from obstacles import*
-
+from utils import load_data
 
 blob_group = pygame.sprite.Group()
 platform_group = pygame.sprite.Group()
 lava_group = pygame.sprite.Group()
 coin_group = pygame.sprite.Group()
 exit_group = pygame.sprite.Group()
-
 
 class World():
 	def __init__(self, data):
@@ -78,3 +77,13 @@ class World():
 		for tile in self.tile_list:
 			screen.blit(tile[0], tile[1])
 
+	def getrectangles(self):
+		collision_rects = []
+		for tile in self.tile_list:
+			collision_rects.append(tile[2])  # Append the collision rectangle to the list
+		return collision_rects
+     
+
+
+#load in level data and create world
+world = World(load_data(level))
