@@ -11,7 +11,9 @@ from utils import*
 from worldMap import*
 #from player import*
 from Pygame_Lights import*
-pygame.display.set_caption("Topcho's Bizzare Adventure")
+
+pygame.display.set_caption(GAME_NAME)
+
 class Player():
 	def __init__(self, x, y):
 		self.reset(x, y)
@@ -39,27 +41,33 @@ class Player():
 				dx += 5
 				self.counter += 1
 				self.direction = 1
-			if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
-				self.counter = 0
-				self.index = 0
-    
+			if key[pygame.K_d]:
+				self.ducked = True
 				if self.direction == 1:
-					self.image = self.images_right[self.index]
-				if self.direction == -1:
-					self.image = self.images_left[self.index]
+					self.image = self.duck_image_right
+				elif self.direction == -1:
+					self.image = self.duck_image_left
+			else:
+				if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
+					self.counter = 0
+					self.index = 0
+		
+					if self.direction == 1:
+						self.image = self.images_right[self.index]
+					if self.direction == -1:
+						self.image = self.images_left[self.index]
 
 
 			#handle animation
-			if self.in_air:
+			if self.in_air == True or self.jumped == True:
 			
 				if self.direction == 1:
 					self.image = self.images_jumping_right[self.counter // walk_cooldown % len(self.images_jumping_right)]
 				elif self.direction == -1:
 					self.image = self.images_jumping_left[self.counter // walk_cooldown % len(self.images_jumping_right)]
-				self.counter = 0  # Reset the counter to prevent frame switching during jump
 
 			else:
-				if self.counter > walk_cooldown:
+				if self.counter > walk_cooldown and self.ducked == False:
 					self.counter = 0	
 					self.index += 1
 					if self.index >= len(self.images_right):
@@ -144,7 +152,7 @@ class Player():
 					pygame.draw.rect(screen, WHITE, (0, y * 100, fade_counter, SCREEN_HEIGHT  ))
 					pygame.draw.rect(screen, WHITE, (SCREEN_WIDTH - fade_counter, y*100, SCREEN_WIDTH, SCREEN_HEIGHT ))
    
-			draw_text('GAME OVER!', FONT_BIG, BLUE_DARK, (SCREEN_WIDTH // 2) - 200, SCREEN_HEIGHT // 2)
+			draw_text('GAME OVER!', FONT_BIG, PINK, (SCREEN_WIDTH // 2) - 200, SCREEN_HEIGHT // 2)
 			if self.rect.y > -SCREEN_HEIGHT:
 				self.rect.y -= 5
 
@@ -165,9 +173,14 @@ class Player():
 			img_right = pygame.transform.scale(img_right, (40, 40))
 			img_left = pygame.transform.flip(img_right, True, False)
    
-			img_jumping_right = pygame.image.load(f'assets/cat_jump1.png')
+			img_jumping_right = pygame.image.load(f'assets/cat_jump{num}.png')
 			img_jumping_right = pygame.transform.scale(img_jumping_right, (40, 40))
 			img_jumping_left = pygame.transform.flip(img_jumping_right, True, False)
+			
+			self.duck_image_right =  pygame.image.load(f'assets/cat3.png')
+			self.duck_image_right = pygame.transform.scale(self.duck_image_right, (40, 40))
+			self.duck_image_left =  pygame.transform.flip(self.duck_image_right, True, False)
+
 
 			self.images_right.append(img_right)
 			self.images_left.append(img_left)
@@ -186,6 +199,7 @@ class Player():
 		self.jumped = False
 		self.direction = 0
 		self.in_air = True
+		self.ducked = False
 
 
 player = Player(100, SCREEN_HEIGHT - 120)
@@ -197,8 +211,8 @@ coin_group.add(score_coin)
 
 #CREATING BUTTONS
 restart_button = Button(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT // 2 + 100, restart_img)
-start_button = Button(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, start_img)
-exit_button = Button(SCREEN_WIDTH // 2 + 30, SCREEN_HEIGHT // 2, exit_img)
+start_button = Button(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 30, start_img)
+exit_button = Button(SCREEN_WIDTH // 2 + 30, SCREEN_HEIGHT // 2 + 30,  exit_img)
 
 def reset_level(level):
 	player.reset(100, SCREEN_HEIGHT - 130)
@@ -231,7 +245,6 @@ light = LIGHT(light_size, pixel_shader(light_size, light_color, light_intensity,
 fade_counter = 0
 run = True
 while run:
-
 	clock.tick(FPS)
 
 	screen.blit(bg_img, (0, 0))
@@ -240,6 +253,7 @@ while run:
 
 	#----- MAIN MENU SCREEN ----#
 	if main_menu == True:
+		draw_text(GAME_NAME, FONT_MID, BLUE_DARK, (SCREEN_WIDTH // 2) - 220, SCREEN_HEIGHT // 2 - 50)
 		if exit_button.draw():
 			run = False
 		if start_button.draw():
@@ -281,7 +295,7 @@ while run:
 		
 
   
-		#if player has died
+		#--- if player has died --- #
 		if game_over == -1:
 			if restart_button.draw():
 				fade_counter = 0
@@ -290,7 +304,7 @@ while run:
 				game_over = 0
 				score = 0
 
-		#if player has completed the level
+		#-- if player has completed the level---- #
 		if game_over == 1:
 			#-----RESET GAME & GO TO THE NEXT LEVEL---#
 			level += 1

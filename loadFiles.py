@@ -16,7 +16,7 @@ exit_img = pygame.transform.scale(pygame.image.load('assets/exit_btn.png') , (15
 
 
 #SOUNDS
-pygame.mixer.music.load('assets/music/gamemusic-6082.mp3')
+pygame.mixer.music.load('assets/music/background/my-little-garden-of-eden-112845.mp3')
 pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play(-1, 0.0, 5000)
 coin_fx = pygame.mixer.Sound('assets/music/reward.mp3')
