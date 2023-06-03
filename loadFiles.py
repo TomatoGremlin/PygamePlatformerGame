@@ -10,6 +10,7 @@ sun_img = pygame.transform.scale(sun_img, (TILE_SIZE, TILE_SIZE))
 bg_img = pygame.image.load('assets/sky.png')
 bg_img = pygame.transform.scale(bg_img , (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+
 restart_img = pygame.transform.scale(pygame.image.load('assets/restart_btn.png') , (150, 50))
 start_img = pygame.transform.scale(pygame.image.load('assets/start_btn.png') , (120, 50))
 exit_img = pygame.transform.scale(pygame.image.load('assets/exit_btn.png') , (150, 50)) 

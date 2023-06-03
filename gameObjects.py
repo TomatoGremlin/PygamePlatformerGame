@@ -10,6 +10,31 @@ class Coin(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 
+    
+heart_scale = 30       
+class Heart(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		super().__init__()
+		self.image_full = pygame.transform.scale( pygame.image.load('assets/heart_full.png'), (heart_scale, heart_scale ) )  
+		self.image_half =  pygame.transform.scale(pygame.image.load('assets/heart_half.png'), (heart_scale, heart_scale))
+		self.image_empty = pygame.transform.scale( pygame.image.load('assets/heart_empty.png'), (heart_scale, heart_scale) )
+
+		self.image = self.image_full  # Start with full heart image
+		self.rect = self.image.get_rect()
+		self.rect.x = x
+		self.rect.y = y
+
+	def update(self, lives):
+		if lives == 3:
+			self.image = self.image_full
+		elif  lives == 2:
+			self.image = self.image_half
+		else:
+			self.image = self.image_empty
+   
+	def draw(self, screen):
+		screen.blit(self.image, self.rect)
+
 
 class Exit(pygame.sprite.Sprite):
 	def __init__(self, x, y):
