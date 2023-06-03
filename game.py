@@ -19,28 +19,34 @@ class Player():
 		self.reset(x, y)
 
 
-	def update(self, game_over, fade_counter):
+	def update(self, game_over, lives , fade_counter):
 		dx, dy = 0, 0
 		walk_cooldown = 5
 		col_thresh = 20
 
 		if game_over == 0:
-			#get keypresses
+			#-----KEYPRESSES-----#
 			key = pygame.key.get_pressed()
+			#JUMP
 			if key[pygame.K_SPACE] and self.jumped == False and self.in_air == False:
+
 				jump_fx.play()
 				self.vel_y = -15
 				self.jumped = True
 			if key[pygame.K_SPACE] == False:
 				self.jumped = False
-			if key[pygame.K_LEFT]:
-				dx -= 5
-				self.counter += 1
-				self.direction = -1
+			#GO RIGHT
 			if key[pygame.K_RIGHT]:
 				dx += 5
 				self.counter += 1
 				self.direction = 1
+			#GO LEFT
+			if key[pygame.K_LEFT]:
+				dx -= 5
+				self.counter += 1
+				self.direction = -1
+
+			#DUCK DOWN
 			if key[pygame.K_d]:
 				self.ducked = True
 				if self.direction == 1:
@@ -48,6 +54,7 @@ class Player():
 				elif self.direction == -1:
 					self.image = self.duck_image_left
 			else:
+
 				if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
 					self.counter = 0
 					self.index = 0
@@ -58,9 +65,8 @@ class Player():
 						self.image = self.images_left[self.index]
 
 
-			#handle animation
+			#----ANIMATION----#
 			if self.in_air == True or self.jumped == True:
-			
 				if self.direction == 1:
 					self.image = self.images_jumping_right[self.counter // walk_cooldown % len(self.images_jumping_right)]
 				elif self.direction == -1:
@@ -78,13 +84,14 @@ class Player():
 						self.image = self.images_left[self.index]
   
 
-			#add gravity
+			#---ADDING GRAVITY---#
 			self.vel_y += 1
 			if self.vel_y > 10:
 				self.vel_y = 10
 			dy += self.vel_y
 
-			#check for collision
+			#-------COLLISION CHECKS: ------#
+			#TILES
 			self.in_air = True
 			for tile in world.tile_list:
 				#check for collision in x direction
@@ -92,33 +99,42 @@ class Player():
 					dx = 0
 				#check for collision in y direction
 				if tile[2].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
-					#check if below the ground i.e. jumping
+					#check if player hits the top of a block
 					if self.vel_y < 0:
+
 						dy = tile[2].bottom - self.rect.top 
 						self.vel_y = 0
-					#check if above the ground i.e. falling
+					#check if player hits bottom of a block
 					elif self.vel_y >= 0:
 						dy = tile[2].top - self.rect.bottom
 						self.vel_y = 0
 						self.in_air = False
 
 
-			#check for collision with enemies
+			#ENEMY COLLISION
 			if pygame.sprite.spritecollide(self, blob_group, False):
-				game_over = -1
 				game_over_fx.play()
+				if lives != 0:
+					lives-= 1
+					player.reset(100, SCREEN_HEIGHT - 70 )
+				else:
+					game_over = -1
 
-			#check for collision with lava
+			#LAVA COLLISION
 			if pygame.sprite.spritecollide(self, lava_group, False):
-				game_over = -1
 				game_over_fx.play()
-
-			#check for collision with exit
+				if lives != 0:
+					lives-= 1
+					player.reset(100, SCREEN_HEIGHT - 70 )
+				else:
+					game_over = -1
+	
+			#EXIT COLLISION
 			if pygame.sprite.spritecollide(self, exit_group, False):
 				game_over = 1
 
 
-			#check for collision with platforms
+			#PLATFORMS COLLISION
 			for platform in platform_group:
 				#collision in the x direction
 				if platform.rect.colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
@@ -139,11 +155,11 @@ class Player():
 						self.rect.x += platform.move_direction
 
 
-			#update player coordinates
+			#UPDATE PLAYER COORDINATES
 			self.rect.x += dx
 			self.rect.y += dy
-
-
+		
+			
 		elif game_over == -1:
 			self.image = self.dead_image
 			if fade_counter < SCREEN_WIDTH:
@@ -156,10 +172,12 @@ class Player():
 			if self.rect.y > -SCREEN_HEIGHT:
 				self.rect.y -= 5
 
+    
+
 		#draw player onto screen
 		screen.blit(self.image, self.rect)
 
-		return game_over, fade_counter
+		return game_over, lives ,fade_counter
 
 
 	def reset(self, x, y):
@@ -196,18 +214,21 @@ class Player():
 		self.rect.x, self.rect.y = x, y
 		self.width, self.height  = self.image.get_width(), self.image.get_height()
 		self.vel_y = 0
+
 		self.jumped = False
 		self.direction = 0
-		self.in_air = True
+		self.in_air = True 
 		self.ducked = False
+		
 
 
-player = Player(100, SCREEN_HEIGHT - 120)
+player = Player(100, SCREEN_HEIGHT - 130)
 
 #DUMMY COLLECTABLE TO SHOW NEXT TO SCORE
 score_coin = Coin(TILE_SIZE // 2, TILE_SIZE // 2)
 coin_group.add(score_coin)
 
+heart = Heart( TILE_SIZE // 2 + 70, TILE_SIZE // 2 - 15)
 
 #CREATING BUTTONS
 restart_button = Button(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT // 2 + 100, restart_img)
@@ -231,25 +252,22 @@ def reset_level(level):
 	#create dummy coin for showing the score
 	score_coin = Coin(TILE_SIZE // 2, TILE_SIZE // 2)
 	coin_group.add(score_coin)
-	return world
 
+	return world
 
 
 
 # ---LIGHT-----#
 light_size = 300
-light_color = (255, 200, 30)  # Yellow light
-light_intensity = 0.25
+light_color = (255, 200, 30)  
+light_intensity = 0.3
 light = LIGHT(light_size, pixel_shader(light_size, light_color, light_intensity, point=True))
 #-------------------
 fade_counter = 0
 run = True
 while run:
 	clock.tick(FPS)
-
 	screen.blit(bg_img, (0, 0))
-	screen.blit(sun_img, (100, 100))
-
 
 	#----- MAIN MENU SCREEN ----#
 	if main_menu == True:
@@ -262,10 +280,14 @@ while run:
     #----GAME----#
     
 		world.draw()
-	 	### Draw a black overlay on the background: ##
+	 	## Draw a black overlay on the background: ##
 		overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
-		overlay.fill((0, 0, 0, 150))  # Adjust the alpha value as desired
+		overlay.fill((0, 0, 0, 160))  # Adjust the alpha value as desired
 		screen.blit(overlay, (0, 0))
+
+		# Draw hearts for lives
+		heart.update(lives)
+		heart.draw(screen)
   
 		if game_over == 0:
 			blob_group.update()
@@ -283,7 +305,7 @@ while run:
 		coin_group.draw(screen)
 		exit_group.draw(screen)
 
-		game_over, fade_counter = player.update(game_over, fade_counter)
+		game_over,lives,  fade_counter = player.update(game_over, lives,  fade_counter)
 		
   
   		#---- Update the light position ----#
@@ -296,6 +318,8 @@ while run:
 
   
 		#--- if player has died --- #
+   
+
 		if game_over == -1:
 			if restart_button.draw():
 				fade_counter = 0
@@ -303,6 +327,10 @@ while run:
 				world = reset_level(level)
 				game_over = 0
 				score = 0
+				lives = 3
+				heart.update
+
+			
 
 		#-- if player has completed the level---- #
 		if game_over == 1:
@@ -328,6 +356,10 @@ while run:
 					world = reset_level(level)
 					game_over = 0
 					score = 0
+					lives = 3
+					heart.update
+
+
 
  	#CLOSE WINDOW:
 	for event in pygame.event.get():
