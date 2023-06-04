@@ -166,12 +166,10 @@ class Player():
 
 		#draw player onto screen
 		screen.blit(self.image, self.rect)
-
 		return game_over, lives ,fade_counter
 
 
 	def reset(self, x, y):
-
 		self.images_right, self.images_left  = [], []
 		self.images_jumping_right, self.images_jumping_left  = [], []
 		self.index, self.counter = 0, 0
@@ -189,13 +187,11 @@ class Player():
 			self.duck_image_right = pygame.transform.scale(self.duck_image_right, (40, 40))
 			self.duck_image_left =  pygame.transform.flip(self.duck_image_right, True, False)
 
-
 			self.images_right.append(img_right)
 			self.images_left.append(img_left)
 			self.images_jumping_right.append(img_jumping_right)
 			self.images_jumping_left.append(img_jumping_left)
 
-   
 		self.dead_image = pygame.transform.scale( pygame.image.load('assets/ghost.png'), (40,40) )
               
 		self.image = self.images_right[self.index]

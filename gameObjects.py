@@ -11,7 +11,7 @@ class Coin(pygame.sprite.Sprite):
 		self.rect.center = (x, y)
 
     
-heart_scale = 35       
+heart_scale = 30       
 class Heart(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		super().__init__()
