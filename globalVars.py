@@ -15,7 +15,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 FONT_BIG = pygame.font.SysFont('Lucida Sans', 70)
 FONT_MID = pygame.font.SysFont('Lucida Sans', 35, True)
 
-FONT_SMALL = pygame.font.SysFont('Lucida Sans', 20)
+FONT_SMALL = pygame.font.SysFont('Lucida Sans', 20, True)
 
 
 #define game variables

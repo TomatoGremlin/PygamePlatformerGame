@@ -11,13 +11,13 @@ class Coin(pygame.sprite.Sprite):
 		self.rect.center = (x, y)
 
     
-heart_scale = 30       
+heart_scale = 35       
 class Heart(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		super().__init__()
-		self.image_full = pygame.transform.scale( pygame.image.load('assets/heart_full.png'), (heart_scale, heart_scale ) )  
-		self.image_half =  pygame.transform.scale(pygame.image.load('assets/heart_half.png'), (heart_scale, heart_scale))
-		self.image_empty = pygame.transform.scale( pygame.image.load('assets/heart_empty.png'), (heart_scale, heart_scale) )
+		self.image_full = pygame.transform.scale( pygame.image.load('assets/heart_full.png'), (heart_scale + 5, heart_scale  ) )  
+		self.image_half =  pygame.transform.scale(pygame.image.load('assets/heart_half.png'), (heart_scale + 5, heart_scale))
+		self.image_empty = pygame.transform.scale( pygame.image.load('assets/heart_empty.png'), (heart_scale + 5, heart_scale) )
 
 		self.image = self.image_full  # Start with full heart image
 		self.rect = self.image.get_rect()
