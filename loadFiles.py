@@ -7,26 +7,28 @@ mixer.init()
 #IMAGES
 bg_img = pygame.transform.scale(pygame.image.load('assets/sky.png') , (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-start_img = pygame.transform.scale(pygame.image.load('assets/start_btn.png') , (120, 50))
-exit_img = pygame.transform.scale(pygame.image.load('assets/exit_btn.png') , (150, 50)) 
-restart_img = pygame.transform.scale(pygame.image.load('assets/restart_btn.png') , (150, 50))
-go_img = pygame.transform.scale(pygame.image.load('assets/go_btn.png') , (70, 30))
-music_on_img = pygame.transform.scale(pygame.image.load('assets/musicOn.png') , (30, 30))
-music_off_img = pygame.transform.scale(pygame.image.load('assets/musicOff.png') , (30, 30))
+start_img = pygame.transform.scale(pygame.image.load('assets/start_btn.png') , (120, TILE_SIZE))
+exit_img = pygame.transform.scale(pygame.image.load('assets/exit_btn.png') , (150, TILE_SIZE)) 
+restart_img = pygame.transform.scale(pygame.image.load('assets/restart_btn.png') , (150, TILE_SIZE))
+go_img = pygame.transform.scale(pygame.image.load('assets/go_btn.png') , ( TILE_SIZE+20 , TILE_SIZE - 20 ))
+music_on_img = pygame.transform.scale(pygame.image.load('assets/musicOn.png') , (TILE_SIZE - 20, TILE_SIZE - 20))
+music_off_img = pygame.transform.scale(pygame.image.load('assets/musicOff.png') , (TILE_SIZE - 20, TILE_SIZE - 20))
 
 
 
 #SOUNDS
+volume = 0.2
+
 pygame.mixer.music.load('assets/music/background/my-little-garden-of-eden-112845.mp3')
-pygame.mixer.music.set_volume(0.2)
+pygame.mixer.music.set_volume( volume - 0.1 )
 pygame.mixer.music.play(-1, 0.0, 5000)
 coin_fx = pygame.mixer.Sound('assets/music/reward.mp3')
-coin_fx.set_volume(0.3)
+coin_fx.set_volume(volume)
 jump_fx = pygame.mixer.Sound('assets/music/jump.mp3')
-jump_fx.set_volume(0.2)
+jump_fx.set_volume(volume - 0.1)
 game_over_fx = pygame.mixer.Sound('assets/music/beefmow.mp3')
-game_over_fx.set_volume(0.3)
+game_over_fx.set_volume(volume)
 victory_fx =  pygame.mixer.Sound('assets/music/winsquare-6993.mp3')
-victory_fx.set_volume(0.3)
+victory_fx.set_volume(volume)
 click_fx = pygame.mixer.Sound('assets/music/mixkit-quick-win-video-game-notification-269.wav')
-click_fx.set_volume(0.15)
+click_fx.set_volume(volume/2)

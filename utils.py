@@ -1,4 +1,5 @@
 import pygame
+from os import path
 from globalVars import screen
 import pickle
 
@@ -8,6 +9,9 @@ def draw_text(text, FONT_BIG, text_col, x, y):
 	screen.blit(img, (x, y))
 
 def load_data(level):
-    pickle_in = open(f'levels/level{level}_data', 'rb')
-    world_data = pickle.load(pickle_in)
-    return world_data
+    if path.exists(f'levels/level{level}_data'):
+        pickle_in = open(f'levels/level{level}_data', 'rb')
+        world_data = pickle.load(pickle_in)
+        return world_data
+
+

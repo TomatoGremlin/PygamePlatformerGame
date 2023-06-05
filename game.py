@@ -1,6 +1,5 @@
 import pygame
 from pygame.locals import *
-from os import path
 
 from button import*
 from gameObjects import*
@@ -25,7 +24,7 @@ start_button = Button(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 30, start_im
 exit_button = Button(SCREEN_WIDTH // 2 + 30, SCREEN_HEIGHT // 2 + 30,  exit_img)
 restart_button = Button(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT // 2 + 100, restart_img)
 go_button = Button(SCREEN_WIDTH - 140, 10,  go_img)
-music_on_button = Button(SCREEN_WIDTH - 60, 10,  music_on_img)
+music_button = Button(SCREEN_WIDTH - 60, 10,  music_on_img)
 
 
 def reset_level(level):
@@ -37,15 +36,11 @@ def reset_level(level):
 	exit_group.empty()
 
 	#load in level data and create world
-	if path.exists(f'levels/level{level}_data'):
-		pickle_in = open(f'levels/level{level}_data', 'rb')
-		world_data = pickle.load(pickle_in)
-	world = World(world_data)
+	world = World(load_data(level))
  
 	#create dummy coin for showing the score
 	score_coin = Coin(TILE_SIZE // 2, TILE_SIZE // 2)
 	coin_group.add(score_coin)
-
 	return world
 
 
@@ -54,7 +49,7 @@ def reset_level(level):
 light_size = 300
 light_color = (255, 200, 30)  
 light_intensity = 0.3
-light = LIGHT(light_size, pixel_shader(light_size, light_color, light_intensity, point=True))
+light = LIGHT( light_size, pixel_shader(light_size, light_color, light_intensity, point=True ))
 #-------------------
 run = True
 while run:
@@ -140,7 +135,8 @@ while run:
 				heart.update
 	
 		#-- B) player has completed the level---- #
-		if game_over == 1:
+		if game_over == 1 :
+
 			#-----RESET GAME & GO TO THE NEXT LEVEL---#
 			level += 1
 			if level <= MAX_LEVELS:
@@ -167,7 +163,7 @@ while run:
 					heart.update
 
 
- 	#CLOSE WINDOW:
+ 	#CLOSE WINDOW / CHANGE LEVEL ↑ ↓ / TOGGLE MUSIC:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			run = False	
@@ -184,7 +180,7 @@ while run:
 					level = MAX_LEVELS
 		if event.type == pygame.MOUSEBUTTONDOWN:
 			# Check if the music button was clicked
-			if music_on_button.draw():
+			if music_button.draw():
 				# Toggle the music state
 				is_music_playing = not is_music_playing
 				
@@ -195,8 +191,8 @@ while run:
 					# Stop playing music
 					pygame.mixer.music.stop()
 				# Update the music button image
-				music_on_button.toggle(is_music_playing, music_on_img, music_off_img)
-	music_on_button.draw()
+				music_button.toggle(is_music_playing, music_on_img, music_off_img)
+	music_button.draw()
 	pygame.display.update()
 
 pygame.quit()

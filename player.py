@@ -8,6 +8,49 @@ class Player():
 	def __init__(self, x, y):
 		self.reset(x, y)
 
+	def animate_player(self, walk_cooldown):
+		if self.in_air == True or self.jumped == True:
+			if self.direction == 1:
+				self.image = self.images_jumping_right[self.counter // walk_cooldown % len(self.images_jumping_right)]
+			elif self.direction == -1:
+				self.image = self.images_jumping_left[self.counter // walk_cooldown % len(self.images_jumping_right)]
+
+		else:
+			if self.counter > walk_cooldown and self.ducked == False:
+				self.counter = 0	
+				self.index += 1
+				if self.index >= len(self.images_right):
+					self.index = 0
+				if self.direction == 1:
+					self.image = self.images_right[self.index]
+				if self.direction == -1:
+					self.image = self.images_left[self.index]
+     	
+ 	
+	def addGravity(self, dy ):
+		self.vel_y += 1
+		if self.vel_y > 10:
+			self.vel_y = 10
+		dy += self.vel_y
+
+		return dy
+
+
+	def check_collision(self, game_over, LIVES):
+		if pygame.sprite.spritecollide(self, blob_group, False) or pygame.sprite.spritecollide(self, lava_group, False) :
+			game_over_fx.play()
+			if LIVES != 1:
+				LIVES-= 1
+				player.reset(100, SCREEN_HEIGHT - 70 )
+			else:
+				game_over = -1
+
+		#EXIT COLLISION
+		if pygame.sprite.spritecollide(self, exit_group, False):
+			game_over = 1
+
+		return game_over, LIVES
+
 
 	def update(self, game_over, LIVES , fade_counter, world):
 		dx, dy = 0, 0
@@ -15,6 +58,7 @@ class Player():
 		col_thresh = 20
 
 		if game_over == 0:
+      
 			#-----KEYPRESSES-----#
 			key = pygame.key.get_pressed()
 			#JUMP
@@ -35,8 +79,7 @@ class Player():
 				dx -= 5
 				self.counter += 1
 				self.direction = -1
-
-			#DUCK DOWN
+			#DUCK DOWN ---> there is a bug i shoud fix it - when player ducks the walking animation stops
 			if key[pygame.K_d]:
 				self.ducked = True
 				if self.direction == 1:
@@ -44,7 +87,6 @@ class Player():
 				elif self.direction == -1:
 					self.image = self.duck_image_left
 			else:
-
 				if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
 					self.counter = 0
 					self.index = 0
@@ -56,29 +98,11 @@ class Player():
 
 
 			#----ANIMATION----#
-			if self.in_air == True or self.jumped == True:
-				if self.direction == 1:
-					self.image = self.images_jumping_right[self.counter // walk_cooldown % len(self.images_jumping_right)]
-				elif self.direction == -1:
-					self.image = self.images_jumping_left[self.counter // walk_cooldown % len(self.images_jumping_right)]
-
-			else:
-				if self.counter > walk_cooldown and self.ducked == False:
-					self.counter = 0	
-					self.index += 1
-					if self.index >= len(self.images_right):
-						self.index = 0
-					if self.direction == 1:
-						self.image = self.images_right[self.index]
-					if self.direction == -1:
-						self.image = self.images_left[self.index]
+			self.animate_player(walk_cooldown)
   
 
 			#---ADDING GRAVITY---#
-			self.vel_y += 1
-			if self.vel_y > 10:
-				self.vel_y = 10
-			dy += self.vel_y
+			dy = self.addGravity(dy)
 
 			#-------COLLISION CHECKS: ------#
 			#TILES
@@ -101,27 +125,8 @@ class Player():
 						self.in_air = False
 
 
-			#ENEMY COLLISION
-			if pygame.sprite.spritecollide(self, blob_group, False):
-				game_over_fx.play()
-				if LIVES != 1:
-					LIVES-= 1
-					player.reset(100, SCREEN_HEIGHT - 70 )
-				else:
-					game_over = -1
-
-			#LAVA COLLISION
-			if pygame.sprite.spritecollide(self, lava_group, False):
-				game_over_fx.play()
-				if LIVES != 1:
-					LIVES-= 1
-					player.reset(100, SCREEN_HEIGHT - 70 )
-				else:
-					game_over = -1
-	
-			#EXIT COLLISION
-			if pygame.sprite.spritecollide(self, exit_group, False):
-				game_over = 1
+			#ENEMY COLLISION & LAVA COLLISION or EXIT
+			game_over, LIVES = self.check_collision(game_over, LIVES)
 
 
 			#PLATFORMS COLLISION
@@ -148,9 +153,9 @@ class Player():
 			#UPDATE PLAYER COORDINATES
 			self.rect.x += dx
 			self.rect.y += dy
-		
 			
 		elif game_over == -1:
+      
 			self.image = self.dead_image
 			if fade_counter < SCREEN_WIDTH:
 				fade_counter += 5 
