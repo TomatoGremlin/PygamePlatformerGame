@@ -10,23 +10,21 @@ class Player():
 		self.reset(x, y)
 
 	def animate_player(self, walk_cooldown):
-		if self.in_air == True or self.jumped == True:
+		if self.in_air or self.jumped:
 			if self.direction == 1:
 				self.image = self.images_jumping_right[self.counter // walk_cooldown % len(self.images_jumping_right)]
 			elif self.direction == -1:
 				self.image = self.images_jumping_left[self.counter // walk_cooldown % len(self.images_jumping_right)]
-
 		else:
 			if not self.ducked:
-				if self.counter > walk_cooldown and self.ducked == False:
-					self.counter = 0	
-					self.index += 1
-					if self.index >= len(self.images_right):
-						self.index = 0
+				if self.counter > walk_cooldown:
+					self.counter = 0
+					self.index = (self.index + 1) % len(self.images_right)
 					if self.direction == 1:
 						self.image = self.images_right[self.index]
-					if self.direction == -1:
+					elif self.direction == -1:
 						self.image = self.images_left[self.index]
+
 		
      	
  	
@@ -62,27 +60,30 @@ class Player():
 
 		if game_over == 0:
       
-			#-----KEYPRESSES-----#
+			# -----KEYPRESSES-----#
 			key = pygame.key.get_pressed()
-			#JUMP
-			if key[pygame.K_SPACE] and self.jumped == False and self.in_air == False:
-
+			# JUMP
+			if key[pygame.K_SPACE] and not self.jumped and not self.in_air:
 				jump_fx.play()
 				self.vel_y = -15
 				self.jumped = True
-			if key[pygame.K_SPACE] == False:
+
+			if not key[pygame.K_SPACE]:
 				self.jumped = False
-			#GO RIGHT
+
+			# GO RIGHT
 			if key[pygame.K_RIGHT]:
 				dx += 5
 				self.counter += 1
 				self.direction = 1
-			#GO LEFT
+
+			# GO LEFT
 			if key[pygame.K_LEFT]:
 				dx -= 5
 				self.counter += 1
 				self.direction = -1
-			#DUCK DOWN ---> there is a bug i shoud fix it - when player ducks the walking animation stops
+
+			# DUCK DOWN
 			if key[pygame.K_d]:
 				self.ducked = True
 				if self.direction == 1:
@@ -92,14 +93,15 @@ class Player():
 			else:
 				self.ducked = False
 
-				if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
+				if not key[pygame.K_LEFT] and not key[pygame.K_RIGHT]:
 					self.counter = 0
 					self.index = 0
-		
+
 					if self.direction == 1:
 						self.image = self.images_right[self.index]
-					if self.direction == -1:
+					elif self.direction == -1:
 						self.image = self.images_left[self.index]
+
 
 
 			#----ANIMATION----#
