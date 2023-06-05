@@ -3,6 +3,7 @@ from loadFiles import jump_fx, game_over_fx
 from globalVars import*
 from utils import*
 from worldMap import *
+from loadFiles import ghost_img
 
 class Player():
 	def __init__(self, x, y):
@@ -16,15 +17,17 @@ class Player():
 				self.image = self.images_jumping_left[self.counter // walk_cooldown % len(self.images_jumping_right)]
 
 		else:
-			if self.counter > walk_cooldown and self.ducked == False:
-				self.counter = 0	
-				self.index += 1
-				if self.index >= len(self.images_right):
-					self.index = 0
-				if self.direction == 1:
-					self.image = self.images_right[self.index]
-				if self.direction == -1:
-					self.image = self.images_left[self.index]
+			if not self.ducked:
+				if self.counter > walk_cooldown and self.ducked == False:
+					self.counter = 0	
+					self.index += 1
+					if self.index >= len(self.images_right):
+						self.index = 0
+					if self.direction == 1:
+						self.image = self.images_right[self.index]
+					if self.direction == -1:
+						self.image = self.images_left[self.index]
+		
      	
  	
 	def add_gravity(self, dy ):
@@ -87,6 +90,8 @@ class Player():
 				elif self.direction == -1:
 					self.image = self.duck_image_left
 			else:
+				self.ducked = False
+
 				if key[pygame.K_LEFT] == False and key[pygame.K_RIGHT] == False:
 					self.counter = 0
 					self.index = 0
@@ -171,7 +176,7 @@ class Player():
 
 		#draw player onto screen
 		screen.blit(self.image, self.rect)
-		return game_over, LIVES ,fade_counter
+		return game_over, LIVES, fade_counter
 
 
 	def reset(self, x, y):
@@ -197,8 +202,7 @@ class Player():
 			self.images_jumping_right.append(img_jumping_right)
 			self.images_jumping_left.append(img_jumping_left)
 
-		self.dead_image = pygame.transform.scale( pygame.image.load('assets/ghost.png'), (40,40) )
-              
+		self.dead_image = ghost_img     
 		self.image = self.images_right[self.index]
 
 		self.rect = self.image.get_rect()
