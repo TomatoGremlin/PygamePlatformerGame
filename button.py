@@ -27,8 +27,15 @@ class Button():
 		if pygame.mouse.get_pressed()[0] == 0:
 			self.clicked = False
 
-
 		#draw button
 		screen.blit(self.image, self.rect)
-
 		return action
+  
+	def update(self, image):
+		self.image = image
+	
+	def toggle(self, is_music_playing, music_on, music_off):
+		if is_music_playing:
+			self.update(music_on)  # Set button image to "play" state
+		else:
+			self.update(music_off)  # Set button image to "pause" state

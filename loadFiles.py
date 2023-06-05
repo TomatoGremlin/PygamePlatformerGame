@@ -11,6 +11,9 @@ start_img = pygame.transform.scale(pygame.image.load('assets/start_btn.png') , (
 exit_img = pygame.transform.scale(pygame.image.load('assets/exit_btn.png') , (150, 50)) 
 restart_img = pygame.transform.scale(pygame.image.load('assets/restart_btn.png') , (150, 50))
 go_img = pygame.transform.scale(pygame.image.load('assets/go_btn.png') , (70, 30))
+music_on_img = pygame.transform.scale(pygame.image.load('assets/musicOn.png') , (30, 30))
+music_off_img = pygame.transform.scale(pygame.image.load('assets/musicOff.png') , (30, 30))
+
 
 
 #SOUNDS

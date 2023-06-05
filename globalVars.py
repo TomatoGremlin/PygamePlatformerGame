@@ -24,12 +24,11 @@ game_over = 0
 main_menu = True
 
 level = 2
-MAX_LEVELS = 2
+MAX_LEVELS = 5
+LIVES = 3
 score = 0
-lives = 3
-
-
-
+is_music_playing = True
+fade_counter = 0
 
 #define colours
 WHITE = (255, 255, 255)

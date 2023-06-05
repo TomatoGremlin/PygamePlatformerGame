@@ -24,8 +24,8 @@ heart = Heart( TILE_SIZE // 2 + 70, TILE_SIZE // 2 - 15)
 start_button = Button(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 + 30, start_img)
 exit_button = Button(SCREEN_WIDTH // 2 + 30, SCREEN_HEIGHT // 2 + 30,  exit_img)
 restart_button = Button(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT // 2 + 100, restart_img)
-
-go_button = Button(SCREEN_WIDTH - 90, 10,  go_img)
+go_button = Button(SCREEN_WIDTH - 140, 10,  go_img)
+music_on_button = Button(SCREEN_WIDTH - 60, 10,  music_on_img)
 
 
 def reset_level(level):
@@ -56,7 +56,6 @@ light_color = (255, 200, 30)
 light_intensity = 0.3
 light = LIGHT(light_size, pixel_shader(light_size, light_color, light_intensity, point=True))
 #-------------------
-fade_counter = 0
 run = True
 while run:
 	clock.tick(FPS)
@@ -68,7 +67,6 @@ while run:
 
 		#--- LEVEL CHOOSING -----#
 		draw_text("↑ ↓ Starting Level: " + str(level), FONT_SMALL, WHITE, (SCREEN_WIDTH // 2) - 90, SCREEN_HEIGHT // 2 + 110)
-     
 		#----------------------------------
 		if exit_button.draw():
 			run = False
@@ -76,24 +74,35 @@ while run:
 			main_menu = False
 			world_data = []
 			world = reset_level(level)
+   
 	else:
+     
     #----GAME----#
 		world.draw()
+		# Draw game objects on screen
+		blob_group.draw(screen)
+		platform_group.draw(screen)
+  
 	 	## Draw a black overlay on the background: ##
 		overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
-		overlay.fill((0, 0, 0, 160))  # Adjust the alpha value as desired
+		overlay.fill((0, 0, 0, 160))  # alpha value  == transparency
 		screen.blit(overlay, (0, 0))
 
-		# Update and Draw the heart for lives
-		heart.update(lives)
+		# Update and Draw the heart for LIVES
+		heart.update(LIVES)
 		heart.draw(screen)
-
-		draw_text("Go To Level: " + str(level), FONT_SMALL, WHITE, SCREEN_WIDTH - 240, 10 )
+  
+  		# Change Levels
+		draw_text("↑ ↓ Go To Level: " + str(level), FONT_SMALL, WHITE, SCREEN_WIDTH - 320, 10 )
 		if go_button.draw():
 			world_data = []
 			world = reset_level(level)
-  
-  
+			score = 0
+			LIVES = 3
+			heart.update
+
+		
+    	#-------------------------------------------#
 		if game_over == 0:
 			blob_group.update()
 			platform_group.update()
@@ -104,21 +113,19 @@ while run:
 			draw_text('X ' + str(score), FONT_SMALL, BLUE_LIGHT, TILE_SIZE - 10, 10)
 		
 		# Draw game objects on screen
-		blob_group.draw(screen)
-		platform_group.draw(screen)
 		lava_group.draw(screen)
 		coin_group.draw(screen)
 		exit_group.draw(screen)
 
 		#Update player Coordinates
-		game_over, lives,  fade_counter = player.update(game_over, lives,  fade_counter, world)
+		game_over, LIVES,  fade_counter = player.update(game_over, LIVES,  fade_counter, world)
   
   		#---- Update the light position ----#
 		light_x = player.rect.centerx
 		light_y = player.rect.centery
 		collision_rects = world.getrectangles()  # Get the collision rectangles from of the map
         # Pass the screen and collision_rects as arguments to light.main()
-		light.main(collision_rects, screen, light_x, light_y, )
+		light.main( collision_rects, screen, light_x, light_y, )
 		
   
 		#--- A) player has died --- #
@@ -129,7 +136,7 @@ while run:
 				world = reset_level(level)
 				game_over = 0
 				score = 0
-				lives = 3
+				LIVES = 3
 				heart.update
 	
 		#-- B) player has completed the level---- #
@@ -137,7 +144,7 @@ while run:
 			#-----RESET GAME & GO TO THE NEXT LEVEL---#
 			level += 1
 			if level <= MAX_LEVELS:
-				#reset level
+				#---RESET LEVEL----#
 				world_data = []
 				world = reset_level(level)
 				game_over = 0
@@ -148,7 +155,7 @@ while run:
 				rectangle_y = (SCREEN_HEIGHT // 2) - (rect_height // 2) + 50
 				pygame.draw.rect(screen, BLUE_LIGHT, (rectangle_x, rectangle_y, rect_width, rect_height))
 
-				draw_text('YOU WIN!', FONT_BIG, BLUE_DARK, (SCREEN_WIDTH // 2) - 160, SCREEN_HEIGHT // 2)
+				draw_text('VICTORY', FONT_BIG, BLUE_DARK, (SCREEN_WIDTH // 2) - 160, SCREEN_HEIGHT // 2)
 				if restart_button.draw():
 					level = 1
 					#---RESET LEVEL----#
@@ -156,7 +163,7 @@ while run:
 					world = reset_level(level)
 					game_over = 0
 					score = 0
-					lives = 3
+					LIVES = 3
 					heart.update
 
 
@@ -164,14 +171,32 @@ while run:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			run = False	
-		if event.type == pygame.K_UP:
-			level -= 1
-			if level < 1:
-				level = MAX_LEVELS
-		elif event.type == pygame.KEYDOWN:
-			level += 1
-			if level > MAX_LEVELS:
-				level = 1 
+		if event.type == pygame.KEYUP:
+			if event.key == pygame.K_UP:
+				print("----------")
+				level += 1
+				if level > MAX_LEVELS:
+					level = 1 
+			elif event.key == pygame.K_DOWN:
+				print("true")
+				level -= 1
+				if level < 1:
+					level = MAX_LEVELS
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			# Check if the music button was clicked
+			if music_on_button.draw():
+				# Toggle the music state
+				is_music_playing = not is_music_playing
+				
+				if is_music_playing:
+					# Start playing music
+					pygame.mixer.music.play()
+				else:
+					# Stop playing music
+					pygame.mixer.music.stop()
+				# Update the music button image
+				music_on_button.toggle(is_music_playing, music_on_img, music_off_img)
+	music_on_button.draw()
 	pygame.display.update()
 
 pygame.quit()

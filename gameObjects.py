@@ -24,10 +24,10 @@ class Heart(pygame.sprite.Sprite):
 		self.rect.x = x
 		self.rect.y = y
 
-	def update(self, lives):
-		if lives == 3:
+	def update(self, LIVES):
+		if LIVES == 3:
 			self.image = self.image_full
-		elif  lives == 2:
+		elif  LIVES == 2:
 			self.image = self.image_half
 		else:
 			self.image = self.image_empty

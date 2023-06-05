@@ -9,7 +9,7 @@ class Player():
 		self.reset(x, y)
 
 
-	def update(self, game_over, lives , fade_counter, world):
+	def update(self, game_over, LIVES , fade_counter, world):
 		dx, dy = 0, 0
 		walk_cooldown = 5
 		col_thresh = 20
@@ -104,8 +104,8 @@ class Player():
 			#ENEMY COLLISION
 			if pygame.sprite.spritecollide(self, blob_group, False):
 				game_over_fx.play()
-				if lives != 1:
-					lives-= 1
+				if LIVES != 1:
+					LIVES-= 1
 					player.reset(100, SCREEN_HEIGHT - 70 )
 				else:
 					game_over = -1
@@ -113,8 +113,8 @@ class Player():
 			#LAVA COLLISION
 			if pygame.sprite.spritecollide(self, lava_group, False):
 				game_over_fx.play()
-				if lives != 1:
-					lives-= 1
+				if LIVES != 1:
+					LIVES-= 1
 					player.reset(100, SCREEN_HEIGHT - 70 )
 				else:
 					game_over = -1
@@ -166,7 +166,7 @@ class Player():
 
 		#draw player onto screen
 		screen.blit(self.image, self.rect)
-		return game_over, lives ,fade_counter
+		return game_over, LIVES ,fade_counter
 
 
 	def reset(self, x, y):
