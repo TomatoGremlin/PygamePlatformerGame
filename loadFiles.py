@@ -7,6 +7,25 @@ mixer.init()
 #IMAGES
 bg_img = pygame.transform.scale(pygame.image.load('assets/sky.png') , (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+dirt_img = pygame.transform.scale( pygame.image.load('assets/dirt.png'), (TILE_SIZE, TILE_SIZE) )
+grass_img = pygame.transform.scale( pygame.image.load('assets/grass.png'), (TILE_SIZE, TILE_SIZE) )
+cave_img = pygame.transform.scale( pygame.image.load('assets/cave.png'), (TILE_SIZE, TILE_SIZE) )
+
+obstacle_image = pygame.image.load('assets/blob.png')
+platform_img = pygame.transform.scale( pygame.image.load('assets/platform.png'), (TILE_SIZE, TILE_SIZE // 2) )
+lava_img = pygame.transform.scale( pygame.image.load('assets/lava.png'), (TILE_SIZE, TILE_SIZE // 2) )
+coin_img = pygame.transform.scale ( pygame.image.load('assets/coin.png'), (TILE_SIZE // 1.5, TILE_SIZE // 1.5) )
+exit_level_img = pygame.transform.scale ( pygame.image.load('assets/exit.png'), (TILE_SIZE, int(TILE_SIZE * 1.5))  )
+
+# heart
+heart_scale = 30       
+
+full_img = pygame.transform.scale( pygame.image.load('assets/heart_full.png'), (heart_scale + 5, heart_scale  ) )  
+half_img = pygame.transform.scale(pygame.image.load('assets/heart_half.png'), (heart_scale + 5, heart_scale))
+empty_img = pygame.transform.scale( pygame.image.load('assets/heart_empty.png'), (heart_scale + 5, heart_scale) )
+
+
+# buttons
 start_img = pygame.transform.scale(pygame.image.load('assets/start_btn.png') , (120, TILE_SIZE))
 exit_img = pygame.transform.scale(pygame.image.load('assets/exit_btn.png') , (150, TILE_SIZE)) 
 restart_img = pygame.transform.scale(pygame.image.load('assets/restart_btn.png') , (150, TILE_SIZE))

@@ -1,11 +1,11 @@
 import pygame
-from globalVars import TILE_SIZE
+from loadFiles import lava_img, platform_img, obstacle_image
 
 
 class Enemy(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.image.load('assets/blob.png')
+		self.image = obstacle_image
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
@@ -23,8 +23,7 @@ class Enemy(pygame.sprite.Sprite):
 class Platform(pygame.sprite.Sprite):
 	def __init__(self, x, y, move_x, move_y):
 		pygame.sprite.Sprite.__init__(self)
-		img = pygame.image.load('assets/platform.png')
-		self.image = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE // 2))
+		self.image = platform_img
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
@@ -46,8 +45,7 @@ class Platform(pygame.sprite.Sprite):
 class Lava(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
-		img = pygame.image.load('assets/lava.png')
-		self.image = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE // 2))
+		self.image = lava_img
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y

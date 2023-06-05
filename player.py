@@ -27,7 +27,7 @@ class Player():
 					self.image = self.images_left[self.index]
      	
  	
-	def addGravity(self, dy ):
+	def add_gravity(self, dy ):
 		self.vel_y += 1
 		if self.vel_y > 10:
 			self.vel_y = 10
@@ -102,7 +102,7 @@ class Player():
   
 
 			#---ADDING GRAVITY---#
-			dy = self.addGravity(dy)
+			dy = self.add_gravity(dy)
 
 			#-------COLLISION CHECKS: ------#
 			#TILES

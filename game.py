@@ -167,17 +167,17 @@ while run:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			run = False	
+   
 		if event.type == pygame.KEYUP:
 			if event.key == pygame.K_UP:
-				print("----------")
 				level += 1
 				if level > MAX_LEVELS:
 					level = 1 
 			elif event.key == pygame.K_DOWN:
-				print("true")
 				level -= 1
 				if level < 1:
 					level = MAX_LEVELS
+     
 		if event.type == pygame.MOUSEBUTTONDOWN:
 			# Check if the music button was clicked
 			if music_button.draw():

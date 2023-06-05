@@ -3,6 +3,7 @@ from globalVars import*
 from gameObjects  import*
 from obstacles import*
 from utils import load_data
+from loadFiles import dirt_img, grass_img, cave_img
 
 blob_group = pygame.sprite.Group()
 platform_group = pygame.sprite.Group()
@@ -14,18 +15,12 @@ class World():
 	def __init__(self, data):
 		self.tile_list = []
 
-		#load images
-		dirt_img = pygame.image.load('assets/dirt.png')
-		grass_img = pygame.image.load('assets/grass.png')
-		cave_img = pygame.image.load('assets/cave.png')
-
-
 		row_count = 0
 		for row in data:
 			col_count = 0
 			for tile in row:
 				if tile == 1:
-					img = pygame.transform.scale(dirt_img, (TILE_SIZE, TILE_SIZE))
+					img = dirt_img
 					img_rect = img.get_rect()
 					img_rect.x, img_rect.y  = col_count * TILE_SIZE, row_count * TILE_SIZE
 					collision_rect = img_rect
@@ -33,7 +28,7 @@ class World():
 					tile = (img, img_rect, collision_rect)
 					self.tile_list.append(tile)
 				if tile == 2:
-					img = pygame.transform.scale(grass_img, (TILE_SIZE, TILE_SIZE))
+					img = grass_img
 					img_rect = img.get_rect()
 					img_rect.x, img_rect.y  = col_count * TILE_SIZE, row_count * TILE_SIZE
      
@@ -61,7 +56,7 @@ class World():
 					exit = Exit(col_count * TILE_SIZE, row_count * TILE_SIZE - (TILE_SIZE // 2))
 					exit_group.add(exit)
 				if tile == 9:
-					img = pygame.transform.scale(cave_img, (TILE_SIZE, TILE_SIZE))
+					img = cave_img
 					img_rect = img.get_rect()
 					img_rect.x, img_rect.y  = col_count * TILE_SIZE, row_count * TILE_SIZE
 					collision_rect = img_rect

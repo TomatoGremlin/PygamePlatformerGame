@@ -1,23 +1,22 @@
 import pygame
-from globalVars import TILE_SIZE,SCREEN_WIDTH
+from globalVars import  SCREEN_WIDTH
+from loadFiles import coin_img, exit_level_img, full_img, half_img, empty_img
 
 
 class Coin(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
-		img = pygame.image.load('assets/coin.png')
-		self.image = pygame.transform.scale(img, (TILE_SIZE // 1.5, TILE_SIZE // 1.5))
+		self.image = coin_img
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 
     
-heart_scale = 30       
 class Heart(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		super().__init__()
-		self.image_full = pygame.transform.scale( pygame.image.load('assets/heart_full.png'), (heart_scale + 5, heart_scale  ) )  
-		self.image_half =  pygame.transform.scale(pygame.image.load('assets/heart_half.png'), (heart_scale + 5, heart_scale))
-		self.image_empty = pygame.transform.scale( pygame.image.load('assets/heart_empty.png'), (heart_scale + 5, heart_scale) )
+		self.image_full = full_img
+		self.image_half =  half_img
+		self.image_empty =  empty_img
 
 		self.image = self.image_full  # Start with full heart image
 		self.rect = self.image.get_rect()
@@ -39,10 +38,9 @@ class Heart(pygame.sprite.Sprite):
 class Exit(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
-		img = pygame.image.load('assets/exit.png')
-		if(x > SCREEN_WIDTH/2 ):
+		if( x > SCREEN_WIDTH // 2 ):
 			img = pygame.transform.flip(img, True, False)
-		self.image = pygame.transform.scale(img, (TILE_SIZE, int(TILE_SIZE * 1.5)))
+		self.image = exit_level_img
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y
