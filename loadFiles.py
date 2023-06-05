@@ -17,6 +17,9 @@ lava_img = pygame.transform.scale( pygame.image.load('assets/lava.png'), (TILE_S
 coin_img = pygame.transform.scale ( pygame.image.load('assets/coin.png'), (TILE_SIZE // 1.5, TILE_SIZE // 1.5) )
 exit_level_img = pygame.transform.scale ( pygame.image.load('assets/exit.png'), (TILE_SIZE, int(TILE_SIZE * 1.5))  )
 
+ghost_img = pygame.transform.scale( pygame.image.load('assets/ghost.png'), (40,40) )
+
+
 # heart
 heart_scale = 30       
 

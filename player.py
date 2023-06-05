@@ -25,8 +25,6 @@ class Player():
 					elif self.direction == -1:
 						self.image = self.images_left[self.index]
 
-		
-     	
  	
 	def add_gravity(self, dy ):
 		self.vel_y += 1
@@ -38,6 +36,7 @@ class Player():
 
 
 	def check_collision(self, game_over, LIVES):
+		#OBSTACLE COLLISION
 		if pygame.sprite.spritecollide(self, blob_group, False) or pygame.sprite.spritecollide(self, lava_group, False) :
 			game_over_fx.play()
 			if LIVES != 1:
@@ -122,7 +121,6 @@ class Player():
 				if tile[2].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
 					#check if player hits the top of a block
 					if self.vel_y < 0:
-
 						dy = tile[2].bottom - self.rect.top 
 						self.vel_y = 0
 					#check if player hits bottom of a block
@@ -160,9 +158,10 @@ class Player():
 			#UPDATE PLAYER COORDINATES
 			self.rect.x += dx
 			self.rect.y += dy
-			
+		
+  
+		# When Player Dies
 		elif game_over == -1:
-      
 			self.image = self.dead_image
 			if fade_counter < SCREEN_WIDTH:
 				fade_counter += 5 
@@ -216,8 +215,6 @@ class Player():
 		self.direction = 0
 		self.in_air = True 
 		self.ducked = False
-
-
 
 
 player = Player(100, SCREEN_HEIGHT - 130)
