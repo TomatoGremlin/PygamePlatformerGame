@@ -9,15 +9,15 @@ class Player():
 	def __init__(self, x, y):
 		self.reset(x, y)
 
-	def animate_player(self, walk_cooldown):
+	def animate_player(self, walking_cooldown):
 		if self.in_air or self.jumped:
 			if self.direction == 1:
-				self.image = self.images_jumping_right[self.counter // walk_cooldown % len(self.images_jumping_right)]
+				self.image = self.images_jumping_right[self.counter // walking_cooldown % len(self.images_jumping_right)]
 			elif self.direction == -1:
-				self.image = self.images_jumping_left[self.counter // walk_cooldown % len(self.images_jumping_right)]
+				self.image = self.images_jumping_left[self.counter // walking_cooldown % len(self.images_jumping_right)]
 		else:
 			if not self.ducked:
-				if self.counter > walk_cooldown:
+				if self.counter > walking_cooldown:
 					self.counter = 0
 					self.index = (self.index + 1) % len(self.images_right)
 					if self.direction == 1:
@@ -26,13 +26,13 @@ class Player():
 						self.image = self.images_left[self.index]
 
  	
-	def add_gravity(self, dy ):
+	def add_gravity(self, speed_y ):
 		self.vel_y += 1
 		if self.vel_y > 10:
 			self.vel_y = 10
-		dy += self.vel_y
+		speed_y += self.vel_y
 
-		return dy
+		return speed_y
 
 
 	def check_collision(self, game_over, LIVES):
@@ -53,8 +53,8 @@ class Player():
 
 
 	def update(self, game_over, LIVES , fade_counter, world):
-		dx, dy = 0, 0
-		walk_cooldown = 5
+		speed_x, speed_y = 0, 0
+		walking_cooldown = 5
 		col_thresh = 20
 
 		if game_over == 0:
@@ -72,13 +72,13 @@ class Player():
 
 			# GO RIGHT
 			if key[pygame.K_RIGHT]:
-				dx += 5
+				speed_x += 5
 				self.counter += 1
 				self.direction = 1
 
 			# GO LEFT
 			if key[pygame.K_LEFT]:
-				dx -= 5
+				speed_x -= 5
 				self.counter += 1
 				self.direction = -1
 
@@ -104,28 +104,28 @@ class Player():
 
 
 			#----ANIMATION----#
-			self.animate_player(walk_cooldown)
+			self.animate_player(walking_cooldown)
   
 
 			#---ADDING GRAVITY---#
-			dy = self.add_gravity(dy)
+			speed_y = self.add_gravity(speed_y)
 
 			#-------COLLISION CHECKS: ------#
 			#TILES
 			self.in_air = True
 			for tile in world.tile_list:
 				#check for collision in x direction
-				if tile[2].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
-					dx = 0
+				if tile[2].colliderect(self.rect.x + speed_x, self.rect.y, self.width, self.height):
+					speed_x = 0
 				#check for collision in y direction
-				if tile[2].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+				if tile[2].colliderect(self.rect.x, self.rect.y + speed_y, self.width, self.height):
 					#check if player hits the top of a block
 					if self.vel_y < 0:
-						dy = tile[2].bottom - self.rect.top 
+						speed_y = tile[2].bottom - self.rect.top 
 						self.vel_y = 0
 					#check if player hits bottom of a block
 					elif self.vel_y >= 0:
-						dy = tile[2].top - self.rect.bottom
+						speed_y = tile[2].top - self.rect.bottom
 						self.vel_y = 0
 						self.in_air = False
 
@@ -137,30 +137,30 @@ class Player():
 			#PLATFORMS COLLISION
 			for platform in platform_group:
 				#collision in the x direction
-				if platform.rect.colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
-					dx = 0
+				if platform.rect.colliderect(self.rect.x + speed_x, self.rect.y, self.width, self.height):
+					speed_x = 0
 				#collision in the y direction
-				if platform.rect.colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
-					#check if below platform
-					if abs((self.rect.top + dy) - platform.rect.bottom) < col_thresh:
+				if platform.rect.colliderect(self.rect.x, self.rect.y + speed_y, self.width, self.height):
+					#check if player is below a platform
+					if abs((self.rect.top + speed_y) - platform.rect.bottom) < col_thresh:
 						self.vel_y = 0
-						dy = platform.rect.bottom - self.rect.top
-					#check if above platform
-					elif abs((self.rect.bottom + dy) - platform.rect.top) < col_thresh:
+						speed_y = platform.rect.bottom - self.rect.top
+					#check if player is above a platform
+					elif abs((self.rect.bottom + speed_y) - platform.rect.top) < col_thresh:
 						self.rect.bottom = platform.rect.top - 1
 						self.in_air = False
-						dy = 0
+						speed_y = 0
 					#move sideways with the platform
 					if platform.move_x != 0:
 						self.rect.x += platform.move_direction
 
 
 			#UPDATE PLAYER COORDINATES
-			self.rect.x += dx
-			self.rect.y += dy
+			self.rect.x += speed_x
+			self.rect.y += speed_y
 		
   
-		# When Player Dies
+		# When Player Dies - Closing Screen
 		elif game_over == -1:
 			self.image = self.dead_image
 			if fade_counter < SCREEN_WIDTH:

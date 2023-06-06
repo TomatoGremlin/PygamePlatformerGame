@@ -1,12 +1,12 @@
 import pygame
 from globalVars import  SCREEN_WIDTH
-from loadFiles import coin_img, exit_level_img, full_img, half_img, empty_img
+from loadFiles import fish_img, exit_level_img, full_img, half_img, empty_img
 
 
-class Coin(pygame.sprite.Sprite):
+class Fish(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
-		self.image = coin_img
+		self.image = fish_img
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 

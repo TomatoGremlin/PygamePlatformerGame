@@ -32,7 +32,7 @@ blob_img = pygame.image.load('assets/blob.png')
 platform_x_img = pygame.image.load('assets/platform_x.png')
 platform_y_img = pygame.image.load('assets/platform_y.png')
 lava_img = pygame.image.load('assets/lava.png')
-coin_img = pygame.image.load('assets/coin.png')
+fish_img = pygame.image.load('assets/fish.png')
 exit_img = pygame.image.load('assets/exit.png')
 save_img = pygame.image.load('assets/save_btn.png')
 load_img = pygame.image.load('assets/load_btn.png')
@@ -104,8 +104,8 @@ def draw_world():
 					img = pygame.transform.scale(lava_img, (tile_size, tile_size // 2))
 					screen.blit(img, (col * tile_size, row * tile_size + (tile_size // 2)))
 				if world_data[row][col] == 7:
-					#coin
-					img = pygame.transform.scale(coin_img, (tile_size // 2, tile_size // 2))
+					#fish
+					img = pygame.transform.scale(fish_img, (tile_size // 2, tile_size // 2))
 					screen.blit(img, (col * tile_size + (tile_size // 4), row * tile_size + (tile_size // 4)))
 				if world_data[row][col] == 8:
 					#exit

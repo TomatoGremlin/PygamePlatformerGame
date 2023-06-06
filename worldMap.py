@@ -8,7 +8,7 @@ from loadFiles import dirt_img, grass_img, cave_img
 blob_group = pygame.sprite.Group()
 platform_group = pygame.sprite.Group()
 lava_group = pygame.sprite.Group()
-coin_group = pygame.sprite.Group()
+fish_group = pygame.sprite.Group()
 exit_group = pygame.sprite.Group()
 
 class World():
@@ -50,8 +50,8 @@ class World():
 					lava = Lava(col_count * TILE_SIZE, row_count * TILE_SIZE + (TILE_SIZE // 2))
 					lava_group.add(lava)
 				if tile == 7:
-					coin = Coin(col_count * TILE_SIZE + (TILE_SIZE // 2), row_count * TILE_SIZE + (TILE_SIZE // 2))
-					coin_group.add(coin)
+					fish = Fish(col_count * TILE_SIZE + (TILE_SIZE // 2), row_count * TILE_SIZE + (TILE_SIZE // 2))
+					fish_group.add(fish)
 				if tile == 8:
 					exit = Exit(col_count * TILE_SIZE, row_count * TILE_SIZE - (TILE_SIZE // 2))
 					exit_group.add(exit)

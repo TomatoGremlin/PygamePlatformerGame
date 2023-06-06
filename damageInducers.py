@@ -1,5 +1,4 @@
 import pygame
-from globalVars import TILE_SIZE
 from loadFiles import lava_img, obstacle_image
 
 class Enemy(pygame.sprite.Sprite):
@@ -17,7 +16,7 @@ class Enemy(pygame.sprite.Sprite):
      
 		self.rect.x += self.move_direction
 		self.move_counter += 1
-		if abs(self.move_counter) > 50:
+		if abs(self.move_counter) > 50: 
 			self.move_direction *= -1
 			self.move_counter *= -1
    

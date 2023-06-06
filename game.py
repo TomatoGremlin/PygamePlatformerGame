@@ -14,8 +14,8 @@ from Pygame_Lights import*
 pygame.display.set_caption(GAME_NAME)
 
 #DUMMY COLLECTABLE TO SHOW NEXT TO SCORE
-score_coin = Coin(TILE_SIZE // 2, TILE_SIZE // 2)
-coin_group.add(score_coin)
+score_fish = Fish(TILE_SIZE // 2, TILE_SIZE // 2)
+fish_group.add(score_fish)
 
 heart = Heart( TILE_SIZE // 2 + 70, TILE_SIZE // 2 - 15)
 
@@ -31,16 +31,16 @@ def reset_level(level):
 	player.reset(100, SCREEN_HEIGHT - 130)
 	blob_group.empty()
 	platform_group.empty()
-	coin_group.empty()
+	fish_group.empty()
 	lava_group.empty()
 	exit_group.empty()
 
 	#load in level data and create world
 	world = World(load_data(level))
  
-	#create dummy coin for showing the score
-	score_coin = Coin(TILE_SIZE // 2, TILE_SIZE // 2)
-	coin_group.add(score_coin)
+	#create dummy fish for showing the score
+	score_fish = Fish(TILE_SIZE // 2, TILE_SIZE // 2)
+	fish_group.add(score_fish)
 	return world
 
 
@@ -101,15 +101,15 @@ while run:
 		if game_over == 0:
 			blob_group.update()
 			platform_group.update()
-			#UPDATE SCORE - check if coin is collected
-			if pygame.sprite.spritecollide(player, coin_group, True):
+			#UPDATE SCORE - check if fish is collected
+			if pygame.sprite.spritecollide(player, fish_group, True):
 				score += 1
-				coin_fx.play()
+				fish_fx.play()
 			draw_text('X ' + str(score), FONT_SMALL, BLUE_LIGHT, TILE_SIZE - 10, 10)
 		
 		# Draw game objects on screen
 		lava_group.draw(screen)
-		coin_group.draw(screen)
+		fish_group.draw(screen)
 		exit_group.draw(screen)
 
 		#Update player Coordinates
@@ -139,12 +139,12 @@ while run:
 
 			#-----RESET GAME & GO TO THE NEXT LEVEL---#
 			level += 1
-			if level <= MAX_LEVELS:
+			if level <= MAX_LEVELS: 
 				#---RESET LEVEL----#
 				world_data = []
 				world = reset_level(level)
 				game_over = 0
-			else:
+			else: # when we reach last level restart from level 1
 				rect_width = SCREEN_WIDTH
 				rect_height = 80
 				rectangle_x = (SCREEN_WIDTH // 2) - (rect_width // 2)
