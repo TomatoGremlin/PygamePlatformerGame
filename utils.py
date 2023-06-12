@@ -4,8 +4,8 @@ from globalVars import screen
 import pickle
 
 
-def draw_text(text, FONT_BIG, text_col, x, y):
-	img = FONT_BIG.render(text, True, text_col)
+def draw_text(text, font, text_col, x, y):
+	img = font.render(text, True, text_col)
 	screen.blit(img, (x, y))
 
 def load_data(level):

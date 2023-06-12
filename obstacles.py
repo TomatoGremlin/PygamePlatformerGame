@@ -1,8 +1,8 @@
 import pygame
 from loadFiles import lava_img, platform_img, obstacle_image
 
-
-class Enemy(pygame.sprite.Sprite):
+# it moves right then left
+class Obstacle(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = obstacle_image

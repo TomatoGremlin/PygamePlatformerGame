@@ -26,18 +26,18 @@ class Player():
 						self.image = self.images_left[self.index]
 
  	
-	def add_gravity(self, speed_y ):
-		self.vel_y += 1
-		if self.vel_y > 10:
-			self.vel_y = 10
-		speed_y += self.vel_y
+	def add_gravity(self, y_change ):
+		self.velocity_y += 1
+		if self.velocity_y > 10:
+			self.velocity_y = 10
+		y_change += self.velocity_y
 
-		return speed_y
+		return y_change
 
 
 	def check_collision(self, game_over, LIVES):
 		#OBSTACLE COLLISION
-		if pygame.sprite.spritecollide(self, blob_group, False) or pygame.sprite.spritecollide(self, lava_group, False) :
+		if pygame.sprite.spritecollide(self, obstacle_group, False) or pygame.sprite.spritecollide(self, lava_group, False) :
 			game_over_fx.play()
 			if LIVES != 1:
 				LIVES-= 1
@@ -48,14 +48,17 @@ class Player():
 		#EXIT COLLISION
 		if pygame.sprite.spritecollide(self, exit_group, False):
 			game_over = 1
-
+   
 		return game_over, LIVES
 
 
-	def update(self, game_over, LIVES , fade_counter, world):
-		speed_x, speed_y = 0, 0
+	def update(self, game_over, LIVES , world):
+		x_change, y_change = 0, 0
 		walking_cooldown = 5
-		col_thresh = 20
+		collision_threshhold = 20
+		# the counter var is to help not increase the animation index all the time  // it increases till we reach walk cooldown and then we increase the animation indx
+		# in other words its to stop the game from filtering through the sprites so fast that its not noticible taht they are actually changing
+		# n iterations need to pass before the animation index increases // acts as a limit
 
 		if game_over == 0:
       
@@ -64,7 +67,7 @@ class Player():
 			# JUMP
 			if key[pygame.K_SPACE] and not self.jumped and not self.in_air:
 				jump_fx.play()
-				self.vel_y = -15
+				self.velocity_y = -15
 				self.jumped = True
 
 			if not key[pygame.K_SPACE]:
@@ -72,13 +75,13 @@ class Player():
 
 			# GO RIGHT
 			if key[pygame.K_RIGHT]:
-				speed_x += 5
+				x_change += 5
 				self.counter += 1
 				self.direction = 1
 
 			# GO LEFT
 			if key[pygame.K_LEFT]:
-				speed_x -= 5
+				x_change -= 5
 				self.counter += 1
 				self.direction = -1
 
@@ -108,68 +111,74 @@ class Player():
   
 
 			#---ADDING GRAVITY---#
-			speed_y = self.add_gravity(speed_y)
+			y_change = self.add_gravity(y_change)
 
 			#-------COLLISION CHECKS: ------#
+			#because the player updates its coordinates after the collision check we have to take into account that he intends to move, so we make a dummy rectangle based on the chage in x and y
 			#TILES
 			self.in_air = True
 			for tile in world.tile_list:
 				#check for collision in x direction
-				if tile[2].colliderect(self.rect.x + speed_x, self.rect.y, self.width, self.height):
-					speed_x = 0
-				#check for collision in y direction
-				if tile[2].colliderect(self.rect.x, self.rect.y + speed_y, self.width, self.height):
+				if tile[2].colliderect(self.rect.x + x_change, self.rect.y, self.width, self.height):
+					x_change = 0
+				#check for collision in y direction // negative y velocity = jumping / going up, positive = going down/ falling
+				if tile[2].colliderect(self.rect.x, self.rect.y + y_change, self.width, self.height):
 					#check if player hits the top of a block
-					if self.vel_y < 0:
-						speed_y = tile[2].bottom - self.rect.top 
-						self.vel_y = 0
+					if self.velocity_y < 0:
+						y_change = tile[2].bottom - self.rect.top 
+						self.velocity_y = 0
 					#check if player hits bottom of a block
-					elif self.vel_y >= 0:
-						speed_y = tile[2].top - self.rect.bottom
-						self.vel_y = 0
+					elif self.velocity_y >= 0:
+						y_change = tile[2].top - self.rect.bottom
+						self.velocity_y = 0
 						self.in_air = False
 
 
-			#ENEMY COLLISION & LAVA COLLISION or EXIT
+			#OBSTACLE COLLISION & LAVA COLLISION or EXIT
 			game_over, LIVES = self.check_collision(game_over, LIVES)
 
 
 			#PLATFORMS COLLISION
 			for platform in platform_group:
 				#collision in the x direction
-				if platform.rect.colliderect(self.rect.x + speed_x, self.rect.y, self.width, self.height):
-					speed_x = 0
+				if platform.rect.colliderect(self.rect.x + x_change, self.rect.y, self.width, self.height):
+					x_change = 0
 				#collision in the y direction
-				if platform.rect.colliderect(self.rect.x, self.rect.y + speed_y, self.width, self.height):
+				if platform.rect.colliderect(self.rect.x, self.rect.y + y_change, self.width, self.height):
 					#check if player is below a platform
-					if abs((self.rect.top + speed_y) - platform.rect.bottom) < col_thresh:
-						self.vel_y = 0
-						speed_y = platform.rect.bottom - self.rect.top
+					if abs((self.rect.top + y_change) - platform.rect.bottom) < collision_threshhold:
+						self.velocity_y = 0
+						y_change = platform.rect.bottom - self.rect.top
 					#check if player is above a platform
-					elif abs((self.rect.bottom + speed_y) - platform.rect.top) < col_thresh:
+					elif abs((self.rect.bottom + y_change) - platform.rect.top) < collision_threshhold:
 						self.rect.bottom = platform.rect.top - 1
 						self.in_air = False
-						speed_y = 0
+						y_change = 0
 					#move sideways with the platform
 					if platform.move_x != 0:
 						self.rect.x += platform.move_direction
 
 
 			#UPDATE PLAYER COORDINATES
-			self.rect.x += speed_x
-			self.rect.y += speed_y
+			self.rect.x += x_change
+			self.rect.y += y_change
 		
   
-		# When Player Dies - Closing Screen
+		# When Player Dies - Closing Screen its ghost acending
 		elif game_over == -1:
 			self.image = self.dead_image
-			if fade_counter < SCREEN_WIDTH:
-				fade_counter += 5 
-				for y in range(0, 6, 2):
-					pygame.draw.rect(screen, WHITE, (0, y * 100, fade_counter, SCREEN_HEIGHT  ))
-					pygame.draw.rect(screen, WHITE, (SCREEN_WIDTH - fade_counter, y*100, SCREEN_WIDTH, SCREEN_HEIGHT ))
+
+			# fade_counter controls the width of the 2 rectangles on each iteration of the game loop
+			if self.fade_counter < SCREEN_WIDTH:
+				self.fade_counter += 5 
+					# left rectangle ( start drawing from x = 0, y = 0 top left ) 
+				pygame.draw.rect(screen, WHITE, (0, 0, self.fade_counter, SCREEN_HEIGHT  ))
+					# right rectangle ( x = start drawing from the right but as the counter increases the rectangle will move further to the left, y = 0  ) 
+				pygame.draw.rect(screen, WHITE, ( SCREEN_WIDTH - self.fade_counter, 0, SCREEN_WIDTH, SCREEN_HEIGHT ))
    
 			draw_text('GAME OVER!', FONT_BIG, PINK, (SCREEN_WIDTH // 2) - 200, SCREEN_HEIGHT // 2)
+   
+			# ghost image rising
 			if self.rect.y > -SCREEN_HEIGHT:
 				self.rect.y -= 5
 
@@ -177,7 +186,7 @@ class Player():
 
 		#draw player onto screen
 		screen.blit(self.image, self.rect)
-		return game_over, LIVES, fade_counter
+		return game_over, LIVES
 
 
 	def reset(self, x, y):
@@ -209,12 +218,15 @@ class Player():
 		self.rect = self.image.get_rect()
 		self.rect.x, self.rect.y = x, y
 		self.width, self.height  = self.image.get_width(), self.image.get_height()
-		self.vel_y = 0
+  
+		#determines how much the player character moves up or down in each game loop iteration
+		self.velocity_y = 0
 
 		self.jumped = False
 		self.direction = 0
 		self.in_air = True 
 		self.ducked = False
+		self.fade_counter = 0 
 
 
 player = Player(100, SCREEN_HEIGHT - 130)

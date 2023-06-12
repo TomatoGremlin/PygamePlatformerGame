@@ -11,9 +11,11 @@ dirt_img = pygame.transform.scale( pygame.image.load('assets/dirt.png'), (TILE_S
 grass_img = pygame.transform.scale( pygame.image.load('assets/grass.png'), (TILE_SIZE, TILE_SIZE) )
 cave_img = pygame.transform.scale( pygame.image.load('assets/cave.png'), (TILE_SIZE, TILE_SIZE) )
 
-obstacle_image = pygame.image.load('assets/blob.png')
+obstacle_image =  pygame.transform.scale ( pygame.image.load('assets/crystal.png'), (TILE_SIZE , TILE_SIZE ) )
 platform_img = pygame.transform.scale( pygame.image.load('assets/platform.png'), (TILE_SIZE, TILE_SIZE // 2) )
 lava_img = pygame.transform.scale( pygame.image.load('assets/lava.png'), (TILE_SIZE, TILE_SIZE // 2) )
+lava2_img = pygame.transform.scale( pygame.image.load('assets/lava2.png'), (TILE_SIZE, TILE_SIZE) )
+
 fish_img = pygame.transform.scale ( pygame.image.load('assets/fish.png'), (TILE_SIZE // 1.5, TILE_SIZE // 1.5) )
 exit_level_img = pygame.transform.scale ( pygame.image.load('assets/exit.png'), (TILE_SIZE, int(TILE_SIZE * 1.5))  )
 

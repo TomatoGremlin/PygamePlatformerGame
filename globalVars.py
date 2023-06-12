@@ -23,8 +23,8 @@ TILE_SIZE = 50
 game_over = 0
 main_menu = True
 
-level = 2
-MAX_LEVELS = 5
+level = 1
+MAX_LEVELS = 4
 LIVES = 3
 score = 0
 is_music_playing = True

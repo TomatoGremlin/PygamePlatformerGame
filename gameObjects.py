@@ -38,9 +38,10 @@ class Heart(pygame.sprite.Sprite):
 class Exit(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
+		img = exit_level_img
 		if( x > SCREEN_WIDTH // 2 ):
 			img = pygame.transform.flip(img, True, False)
-		self.image = exit_level_img
+		self.image = img
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y

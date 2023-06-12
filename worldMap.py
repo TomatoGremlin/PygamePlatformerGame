@@ -3,9 +3,9 @@ from globalVars import*
 from gameObjects  import*
 from obstacles import*
 from utils import load_data
-from loadFiles import dirt_img, grass_img, cave_img
+from loadFiles import dirt_img, grass_img, cave_img, lava2_img
 
-blob_group = pygame.sprite.Group()
+obstacle_group = pygame.sprite.Group()
 platform_group = pygame.sprite.Group()
 lava_group = pygame.sprite.Group()
 fish_group = pygame.sprite.Group()
@@ -38,8 +38,8 @@ class World():
 					self.tile_list.append(tile)
 					
 				if tile == 3:
-					blob = Enemy(col_count * TILE_SIZE, row_count * TILE_SIZE + 15)
-					blob_group.add(blob)
+					obstacle = Obstacle(col_count * TILE_SIZE, row_count * TILE_SIZE + 15)
+					obstacle_group.add(obstacle)
 				if tile == 4:
 					platform = Platform(col_count * TILE_SIZE, row_count * TILE_SIZE, 1, 0)
 					platform_group.add(platform)
@@ -57,6 +57,14 @@ class World():
 					exit_group.add(exit)
 				if tile == 9:
 					img = cave_img
+					img_rect = img.get_rect()
+					img_rect.x, img_rect.y  = col_count * TILE_SIZE, row_count * TILE_SIZE
+					collision_rect = img_rect
+
+					tile = (img, img_rect, collision_rect)
+					self.tile_list.append(tile)
+				if tile == 10:
+					img = lava2_img
 					img_rect = img.get_rect()
 					img_rect.x, img_rect.y  = col_count * TILE_SIZE, row_count * TILE_SIZE
 					collision_rect = img_rect

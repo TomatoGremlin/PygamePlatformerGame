@@ -29,7 +29,7 @@ music_button = Button(SCREEN_WIDTH - 60, 10,  music_on_img)
 
 def reset_level(level):
 	player.reset(100, SCREEN_HEIGHT - 130)
-	blob_group.empty()
+	obstacle_group.empty()
 	platform_group.empty()
 	fish_group.empty()
 	lava_group.empty()
@@ -48,7 +48,7 @@ def reset_level(level):
 # ---LIGHT-----#
 light_size = 300
 light_color = (255, 200, 30)  
-light_intensity = 0.3
+light_intensity = 0.4
 light = LIGHT( light_size, pixel_shader(light_size, light_color, light_intensity, point=True ))
 #-------------------
 run = True
@@ -75,7 +75,7 @@ while run:
     #----GAME----#
 		world.draw()
 		# Draw game objects on screen
-		blob_group.draw(screen)
+		obstacle_group.draw(screen)
 		platform_group.draw(screen)
   
 	 	## Draw a black overlay on the background: ##
@@ -99,7 +99,7 @@ while run:
 		
     	#-------------------------------------------#
 		if game_over == 0:
-			blob_group.update()
+			obstacle_group.update()
 			platform_group.update()
 			#UPDATE SCORE - check if fish is collected
 			if pygame.sprite.spritecollide(player, fish_group, True):
@@ -113,7 +113,7 @@ while run:
 		exit_group.draw(screen)
 
 		#Update player Coordinates
-		game_over, LIVES,  fade_counter = player.update(game_over, LIVES,  fade_counter, world)
+		game_over, LIVES = player.update(game_over, LIVES,  world)
   
   		#---- Update the light position ----#
 		light_x = player.rect.centerx
@@ -126,7 +126,6 @@ while run:
 		#--- A) player has died --- #
 		if game_over == -1:
 			if restart_button.draw():
-				fade_counter = 0
 				world_data = []
 				world = reset_level(level)
 				game_over = 0
@@ -137,9 +136,9 @@ while run:
 		#-- B) player has completed the level---- #
 		if game_over == 1 :
 
-			#-----RESET GAME & GO TO THE NEXT LEVEL---#
-			level += 1
-			if level <= MAX_LEVELS: 
+			#-----RESET GAME & GO TO THE NEXT LEVEL---#	
+			if level < MAX_LEVELS: 
+				level += 1
 				#---RESET LEVEL----#
 				world_data = []
 				world = reset_level(level)
@@ -168,7 +167,7 @@ while run:
 		if event.type == pygame.QUIT:
 			run = False	
    
-		if event.type == pygame.KEYUP:
+		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_UP:
 				level += 1
 				if level > MAX_LEVELS:
